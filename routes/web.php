@@ -61,7 +61,7 @@ Route::prefix('/payment')->group(function(){
 });
 
 
-
+// Contact - Latif
 
 
 // Tampilan Gambar
@@ -69,9 +69,7 @@ Route::get('/url/{slug}', [ProvidePhotoController::class, 'index'])->name('provi
 Route::post('/gallery/{folder}/guest', [EventGuestController::class, 'store'])->name('guest.store');
 
 
-Route::get('/', function () {
-    return view('layout.welcome');
-});
+
 
 
 
@@ -347,4 +345,14 @@ Route::middleware(['auth', 'phone'])->group(function () {
 
 
 });
+
+
+
+
+Route::get('/', function () {
+    return view('layout.welcome');
+});
+
+// privacy-policy - Latif
+// faq - Latif
 
