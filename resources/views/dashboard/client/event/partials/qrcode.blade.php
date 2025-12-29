@@ -24,11 +24,12 @@
                         </div>
 
                         <div class="col-md-7 order-md-1 ">
-                            <h5 class="mb-3">Share with your guests
+                            <h5 class="mb-3">Bagikan dengan tamu Anda
                             </h5>
                             <p class="text-muted" style="font-size: 0.85rem;">
-                                You can share your event via a link or a QR code. Here you can also select a print-ready
-                                template with your QR code on it. </p>
+                                Anda dapat membagikan acara Anda melalui tautan atau kode QR. Di sini Anda juga dapat
+                                memilih templat siap cetak
+                                dengan kode QR Anda di dalamnya.</p>
                         </div>
 
                     </div>

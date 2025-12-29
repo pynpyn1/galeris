@@ -3,11 +3,14 @@
             @if ($package->plan === 'pro')
                 @continue
             @endif
+            @if ($package->plan === 'beginner')
+                @continue
+            @endif
             <div class="col-12 col-sm-10 col-md-4 mb-4">
 
-                <div class="card shadow-sm h-100 p-4 border-0 position-relative overflow-hidden
-                {{ $package->plan === 'premium' ? 'bg-primary text-white' : 'bg-white text-dark' }}"
-                    style="border-radius: 1rem;">
+                <div
+                    class="card shadow-sm h-100 p-4 border-0 position-relative overflow-hidden
+                {{ $package->plan === 'premium' ? 'bg-primary text-white' : 'bg-white text-dark' }}">
 
                     {{-- Badge Promo --}}
                     @if ($package->plan === 'premium')
@@ -51,7 +54,7 @@
                             @foreach ($package->feature as $feature)
                                 <li class="mb-2 d-flex align-items-start">
                                     <i class="bi bi-check-circle-fill me-2 mt-1
-                                    {{ $package->plan === 'premium' ? 'text-light' : 'text-primary' }}"
+                                    {{ $package->plan === 'premium' ? 'text-light' : 'text-success' }}"
                                         style="font-size: 1.1rem;">
                                     </i>
                                     <span>{{ $feature }}</span>

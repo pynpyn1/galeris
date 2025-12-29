@@ -6,12 +6,12 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Build your QR code the way you want it.</p>
+                    <p>Buat kode QR Anda sesuai keinginan Anda.</p>
                     <div class="row">
                         <div class="col-md-6 border-end">
                             <form id="qr-design-form">
                                 <div class="mb-4">
-                                    <h6>QR code style</h6>
+                                    <h6>Gaya kode QR</h6>
                                     <div class="btn-group" role="group" aria-label="QR Code Style">
                                         <input type="radio" class="btn-check" name="qr_style" id="styleSquare"
                                             value="square" checked>
@@ -28,7 +28,7 @@
                                 </div>
 
                                 <div class="mb-4">
-                                    <h6>QR eye style</h6>
+                                    <h6>Gaya mata QR</h6>
                                     <div class="btn-group" role="group" aria-label="QR Eye Style">
                                         <input type="radio" class="btn-check" name="qr_eye_style" id="eyeSquare"
                                             value="square" checked>
@@ -45,7 +45,7 @@
                                 </div>
 
                                 <div class="mb-4">
-                                    <div class="fw-semibold mb-2">Error Correction</div>
+                                    <div class="fw-semibold mb-2">Koreksi Kesalahan</div>
                                     <select class="form-select" id="errorCorrection">
                                         <option value="L">Low</option>
                                         <option value="M" selected>Medium</option>
@@ -55,7 +55,7 @@
                                 </div>
 
                                 <div class="mb-4">
-                                    <h6>QR Color</h6>
+                                    <h6>Warna QR</h6>
                                     <div class="d-flex align-items-center">
                                         <div class="me-3 ">
                                             <label for="fgColor" class="form-label">Foreground</label>
@@ -84,10 +84,10 @@
                 </div>
                 <div class="modal-footer justify-content-end">
                     <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">
-                        Cancel
+                        Batal
                     </button>
                     <button type="button" class="btn btn-primary py-2 " id="save-qr-design-btn">
-                        Save design
+                        Simpan desin
                     </button>
                 </div>
             </div>

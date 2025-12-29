@@ -3,7 +3,7 @@
             <div class="modal-content">
 
                 <div class="modal-header border-0">
-                    <h5 class="modal-title">Upload event image</h5>
+                    <h5 class="modal-title">Unggah gambar acara</h5>
                     <button class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
 

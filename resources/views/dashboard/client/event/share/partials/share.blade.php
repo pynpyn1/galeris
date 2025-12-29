@@ -3,10 +3,10 @@
          <div class="card-body">
              <div class="row align-items-center">
                  <div class="col-md-12">
-                     <h5 class="mb-3 text-primary">Share via link</h5>
+                     <h5 class="mb-3">Bagikan melalui tautan</h5>
                      <p class="text-muted" style="font-size: 0.9rem;">
-                         Share the link below with your guests. They'll be able to access the event gallery once you
-                         activate it.
+                         Bagikan tautan di bawah ini kepada tamu Anda. Mereka akan dapat mengakses galeri acara setelah
+                         Anda mengaktifkannya.
                      </p>
                      <div class="input-group mb-3">
                          <input type="text" id="share-link" class="form-control" value="{{ $url }}" readonly
@@ -16,11 +16,11 @@
                      <div class="d-flex justify-content-end">
                          <button class="btn btn-outline-primary me-2" type="button" id="copy-button"
                              data-bs-toggle="tooltip" data-bs-placement="top" title="Salin Link">
-                             Copy Link
+                             Salin Tautan
                          </button>
                          <a href="{{ route('provide.photo', $link->slug) }}" class="btn btn-primary" type="button"
                              id="copy-button" data-bs-toggle="tooltip" data-bs-placement="top" title="Salin Link">
-                             Open Link
+                             Buka Tautan
                          </a>
 
                      </div>

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Login Dashboard</title>
+    <title>Login Dashboard</title>
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
@@ -96,11 +96,11 @@
                 <div class="login-container">
                     <div class="row g-0">
                         <div class="col-md-6 login-image d-none d-md-flex">
+                            <img src="{{ asset('asset/img/GALLERIS_WHITE.png') }}" class="w-25 mb-2" alt="">
                             <h2 class="fw-bold text-light mb-3">Selamat Datang Kembali!</h2>
                             <p class="lead">
                                 Kelola galeri Anda dengan lebih mudah dan cepat dalam satu platform terintegrasi.
                             </p>
-                            <span class="badge bg-light text-dark w-25  p-2">v1.1 Galleris</span>
                         </div>
 
                         <div class="col-md-6 login-form-section">
@@ -138,9 +138,23 @@
                                 <span>ATAU</span>
                             </div>
 
-                            <a href="{{ route('google.login') }}" class="btn w-100 btn-outline-danger btn-login">
-                                <i class="bi bi-google "></i> Google
+
+                            <a href="{{ route('social.login', ['provider' => 'discord']) }}"
+                                class="mb-2 btn w-100 btn-outline-primary btn-login">
+                                <i class="bi bi-discord"></i> Discord
                             </a>
+
+                            <a href="{{ route('social.login', ['provider' => 'google']) }}"
+                                class="btn w-100 btn-outline-danger btn-login">
+                                <i class="bi bi-google"></i> Google
+                            </a>
+
+                            <a href="{{ route('social.login', ['provider' => 'facebook']) }}"
+                                class="mt-2 btn w-100 btn-outline-primary btn-login">
+                                <i class="bi bi-facebook"></i> Facebook
+                            </a>
+
+
 
                             <p class="text-center text-muted small mt-4">
                                 &copy; 2025 Gallèris. All rights reserved.

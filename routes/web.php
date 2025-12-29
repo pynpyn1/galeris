@@ -16,6 +16,7 @@ use App\Http\Controllers\ChatBotController;
 use App\Http\Controllers\API\ChatBotController as ApiChatBotController;
 use App\Http\Controllers\API\VideoController as ApiVideoController;
 use App\Http\Controllers\API\QrTemplateController as ApiQrTemplateController;
+use App\Http\Controllers\ConnectController;
 use App\Http\Controllers\Client\Event\EventController;
 use App\Http\Controllers\Client\Event\PurchaseController;
 use App\Http\Controllers\Client\Event\QrTemplateController as EventQrTemplateController;
@@ -26,8 +27,9 @@ use App\Http\Controllers\Client\QrCodeController;
 use App\Http\Controllers\Client\SettingChatBotController;
 use App\Http\Controllers\Client\WhatsappController;
 use App\Http\Controllers\ClientController;
-use App\Http\Controllers\ConnectController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Auth\DiscordController;
+use App\Http\Controllers\Auth\FacebookController;
 use App\Http\Controllers\DiscountController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProvidePhotoController;
@@ -35,7 +37,12 @@ use App\Http\Controllers\RolePermissionController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\VideoController;
 use App\Http\Controllers\EventGuestController;
-use App\Http\Controllers\GoogleAuthController;
+use App\Http\Controllers\Auth\GoogleController;
+use App\Http\Controllers\Auth\SocialLoginController;
+use App\Http\Controllers\Client\Event\GalleryWallController;
+use App\Http\Controllers\Client\Event\PhotoController as EventPhotoController;
+use App\Http\Controllers\Client\Event\VideoController as EventVideoController;
+use App\Http\Controllers\HelpController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\QrTemplateController;
@@ -66,19 +73,33 @@ Route::prefix('/payment')->group(function(){
 
 // Tampilan Gambar
 Route::get('/url/{slug}', [ProvidePhotoController::class, 'index'])->name('provide.photo');
+Route::get('/url/{slug}/livewall', [GalleryWallController::class, 'index'])->name('livewall.photo');
 Route::post('/gallery/{folder}/guest', [EventGuestController::class, 'store'])->name('guest.store');
 
 
+// Help
+Route::prefix('/help')->name('help.')->group(function() {
+    Route::get('/terms-of-services', [HelpController::class,'tos'])->name('tos');
+    Route::get('/privacy-policy', [HelpController::class,'privacy'])->name('privacy');
+
+    Route::prefix('/contact-us')->name('contactus.')->group(function() {
+        Route::get('/', [HelpController::class, 'index'])->name('index');
+        Route::post('/store', [HelpController::class, 'store'])->name('store');
+    });
+});
 
 
 
 
 // Guest
-
 Route::middleware(['guest'])->group(function () {
 
-     Route::get('/auth/google', [GoogleAuthController::class, 'redirect'])->name('google.login');
-    Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback']);
+    Route::prefix('/auth')->group(function() {
+        Route::get('/{provider}', [SocialLoginController::class, 'redirectToProvider'])
+            ->name('social.login');
+        Route::get('/{provider}/callback', [SocialLoginController::class, 'handleProviderCallback']);
+    });
+
 
     Route::get('login', [AuthController::class, 'index'])->name('login');
     Route::post('login/store', [AuthController::class, 'store'])->name('login.post');
@@ -95,6 +116,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/profile/phone', [AuthController::class, 'phoneUpdate'])->name('auth.phone.store');
 
 
+
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
@@ -107,10 +129,11 @@ Route::middleware(['auth'])->group(function () {
 
     // Profile
     Route::prefix('/profile')->name('profile.')->group(function() {
-        Route::get('/{profile}', [ProfileController::class, 'index'])->name('index');
+        Route::get('/', [ProfileController::class, 'index'])->name('index');
         Route::put('/update/{profile}', [ProfileController::class, 'update'])->name('update');
         Route::put('/password/{profile}', [ProfileController::class, 'password'])->name('password');
     });
+
 
 });
 
@@ -259,30 +282,7 @@ Route::middleware(['auth'])->group(function () {
 // Middleware Client
 
 Route::middleware(['auth', 'phone'])->group(function () {
-
-
-    // Create Foto
-    Route::prefix('/photo')->middleware([ 'auth','permission:upload_photo'])->name('photo.')->group(function () {
-        Route::get('/', [ClientPhotoController::class, 'index'])->name("index");
-        Route::get('/data', [ClientPhotoController::class, 'data'])->name("data");
-        Route::get('/create', [ClientPhotoController::class, 'create'])->name("create");
-        Route::post('/store', [ClientPhotoController::class, 'store'])->name("store");
-        Route::get('/edit/{photo}', [ClientPhotoController::class, 'edit'])->name("edit");
-        Route::put('/{photo}', [ClientPhotoController::class, 'update'])->name("update");
-        Route::delete('/destroy/{photo}', [ClientPhotoController::class, 'destroy'])->name("destroy");
-            Route::get('/folder/{id}', [ClientPhotoController::class, 'showFolder'])->name('folder');
-    });
-
-    // Manage QR Code
-    Route::prefix('/qrcode')->middleware(['permission:manage_qr_code'])->name('qrcode.')->group(function () {
-        Route::get('/', [QrCodeController::class, 'index'])->name("index");
-        Route::get('/data', [QrCodeController::class, 'data'])->name("data");
-        Route::get('/create', [QrCodeController::class, 'create'])->name("create");
-        Route::post('/store', [QrCodeController::class, 'store'])->name("store");
-        Route::get('/edit/{qrcode}', [QrCodeController::class, 'edit'])->name("edit");
-        Route::put('/{qrcode}', [QrCodeController::class, 'update'])->name("update");
-        Route::delete('/destroy/{qrcode}', [QrCodeController::class, 'destroy'])->name("destroy");
-    });
+    Route::get('/home/subscribe', [DashboardController::class, 'subscribe'])->name('home.subscribe');
 
     // Manage Folder
     Route::prefix('/folder/client')->middleware(['permission:create_folder'])->name('folder.client.')->group(function () {
@@ -297,20 +297,16 @@ Route::middleware(['auth', 'phone'])->group(function () {
 
     // Setting ChatBot Client
     Route::prefix('chatbot')->middleware(['permission:setting_chatbot'])->name('chatbot.')->group(function() {
-            Route::get('/', [SettingChatBotController::class, 'index'])->name('index');
-            Route::get('/data', [SettingChatBotController::class, 'data'])->name('data');
-            Route::get('/edit/{chatbot}', [SettingChatBotController::class, 'edit'])->name('edit');
             Route::put('/{chatbot}', [SettingChatBotController::class, 'update'])->name('update');
     });
 
 
     // Home
     Route::prefix('/home')->middleware(['permission:dashboard_client', 'permission:manage_qr_code', 'permission:create_folder', 'permission:upload_photo'])->name('home.')->group(function() {
+
         Route::get('/',[DashboardController::class, 'index'])->name('index');
-        Route::get('/subscribe',[DashboardController::class, 'subscribe'])->name('subscribe');
 
         // Purchase
-
         Route::prefix('invoice')->name('checkout.')->middleware('auth')->group(function () {
             Route::post('/select', [PurchaseController::class, 'select'])->name('select');
             Route::get('/{purchase}', [PurchaseController::class, 'show'])->name('show');
@@ -332,6 +328,9 @@ Route::middleware(['auth', 'phone'])->group(function () {
         Route::get('/{folder:public_code}/share', [ShareController::class, 'index'])->name('share');
         Route::post('/{folder:public_code}/share/generate-qr', [ShareController::class, 'generateqr'])->name('generate');
         Route::post('/{folder:public_code}/remind',[ShareController::class, 'remind'])->name('remind');
+        Route::post('/{folder:public_code}/import',[ShareController::class, 'import'])->name('import');
+        Route::get('/{folder:public_code}/template/download', [ShareController::class, 'downloadTemplate'])->name('template.download');
+
 
         // Toggle Whatsapp Bot
         Route::post('/whatsapp/{user}/toggle', [WhatsappController::class, 'toggle'])->name('togglewa');
@@ -340,7 +339,20 @@ Route::middleware(['auth', 'phone'])->group(function () {
         Route::get('/{folder:public_code}/template', [EventQrTemplateController::class, 'index'])->name('templates');
         Route::get('/{folder:public_code}/template/{templateFile}/download',[EventQrTemplateController::class, 'download'])->name('templates.download');
 
+        // Photo
+        Route::prefix('/photo/{folder:public_code}')->middleware('permission:upload_photo')->controller(EventPhotoController::class)->name('photo.')->group(function() {
+            Route::get('/', 'index')->name('index');
+            Route::post('/upload', 'store')->name('store');
+            Route::delete('/all', 'destroyAll')->name('destroyAll');
+            Route::delete('/{photo}', 'destroy')->name('destroy');
+        });
 
+        Route::prefix('/video/{folder:public_code}')->middleware('permission:upload_video')->controller(EventVideoController::class)->name('video.')->group(function() {
+            Route::get('/', 'index')->name('index');
+            Route::post('/upload', 'store')->name('store');
+            Route::delete('/all', 'destroyAll')->name('destroyAll');
+            Route::delete('/{photo}', 'destroy')->name('destroy');
+        });
     });
 
 

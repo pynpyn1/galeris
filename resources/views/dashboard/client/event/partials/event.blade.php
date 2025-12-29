@@ -33,7 +33,7 @@
                         </p>
 
                         <span class="text-muted" style="font-size: 0.85rem;">
-                            The event expires on
+                            Acara ini berakhir pada
                             {{ \Carbon\Carbon::parse($event->date_event_end)->format('d M Y') }}
                         </span>
                     </div>

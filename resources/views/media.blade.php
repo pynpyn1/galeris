@@ -363,17 +363,79 @@
                 min-width: 90%;
             }
         }
+
+        .logo-light,
+        .logo-dark {
+            height: 45px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transition: opacity 0.3s;
+        }
+
+        .logo-light {
+            opacity: 1;
+        }
+
+        .logo-dark {
+            opacity: 0;
+        }
     </style>
 </head>
 
 <body>
+    <div class="modal fade" id="nameInputModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 25px; border: none; overflow: hidden;">
+                <div class="modal-header border-0 text-white p-4" style="background-color: #435ebf">
+                    <div>
+                        <h5 class="modal-title fw-bold mb-1">Satu langkah lagi!</h5>
+                        <p class="mb-0" style="font-size: 0.9rem; opacity: 0.9;">Siapa nama Kakak?</p>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
 
+                <form action="{{ route('guest.store', $link->folder->id) }}" method="post">
+                    @csrf
+                    <div class="modal-body p-4">
+
+                        <div class="mb-3">
+                            <label for="inputName" class="form-label text-muted small fw-bold">NAMA TAMU</label>
+                            <input type="text" name="name" class="form-control form-control-lg bg-light border-0"
+                                id="inputName" placeholder="Tulis nama Kakak di sini..." required
+                                style="border-radius: 15px;">
+                        </div>
+
+                        <input type="hidden" name="number" id="hiddenNumber">
+
+                        <div class="alert alert-light border d-flex align-items-center gap-2 p-2 rounded-3"
+                            role="alert">
+                            <small class="text-muted">Nomor WA: <span id="previewNumber"
+                                    class="fw-bold text-dark"></span></small>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer border-0 p-4 pt-0">
+                        <button type="button" class="btn btn-light rounded-pill px-4"
+                            data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn text-light rounded-pill px-5 shadow-sm"
+                            style="background-color: #435ebf">
+                            Kirim <i class="bi bi-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <div class="hero-section">
         <div class="hero-overlay"></div>
         <div class="top-nav-actions">
-            <a href="#" class="logo-wrapper">
-                <img src="{{ asset('asset/img/logo.png') }}" alt="Logo">
+            <a href="/" class="logo-wrapper">
+                <img src="{{ asset('asset/img/GALLERIS_LOGO.png') }}" alt="Logo" class="logo-light">
+                <img src="{{ asset('asset/img/GALLERIS_WHITE.png') }}" alt="Logo" class="logo-dark">
             </a>
+
             <div class="dropdown">
                 <button class="btn btn-download-main dropdown-toggle" data-bs-toggle="dropdown">
                     <i class="bi bi-cloud-arrow-down-fill me-2"></i> Download
@@ -405,15 +467,18 @@
             <div class="col-12 col-md-6 col-lg-5">
                 <form action="{{ route('guest.store', $link->folder->id) }}" method="post">
                     @csrf
+
                     <div class="search-bar-wrapper">
-                        <input name="number" type="tel" placeholder="Kirim ke WhatsApp...">
-                        <button class="btn-send-wa">
+                        <input id="displayNumber" type="tel" placeholder="Kirim ke WhatsApp..."
+                            class="form-control border-0 shadow-none">
+                        <button type="button" class="btn-send-wa" id="btnTriggerModal">
                             <i class="bi bi-send-fill"></i>
                         </button>
                     </div>
                 </form>
                 <div class="mt-2 ps-2">
-                    <small class="text-muted d-flex align-items-center gap-2" style="font-size: 0.75rem; opacity: 0.8;">
+                    <small class="text-muted d-flex align-items-center gap-2"
+                        style="font-size: 0.75rem; opacity: 0.8;">
                         <i class="bi bi-info-circle-fill text-primary"></i>
                         Simpan link galeri ini di WA Anda
                     </small>
@@ -440,7 +505,8 @@
 
                     <div class="tag-pill filter-btn active" data-target="all">Semua ({{ $media->count() }})</div>
                     @if ($photosCount > 0)
-                        <div class="tag-pill filter-btn" data-target="photo"><i class="bi bi-image me-1"></i> Foto</div>
+                        <div class="tag-pill filter-btn" data-target="photo"><i class="bi bi-image me-1"></i> Foto
+                        </div>
                     @endif
                     @if ($videosCount > 0)
                         <div class="tag-pill filter-btn" data-target="video"><i class="bi bi-play-circle me-1"></i>
@@ -469,8 +535,9 @@
                 $timestamp = \Carbon\Carbon::parse($item->created_at)->timestamp;
             @endphp
 
-            <div class="gallery-item filter-item" data-type="{{ $type }}" data-timestamp="{{ $timestamp }}"
-                data-url="{{ asset('storage/' . $item->file_path) }}" data-filename="{{ basename($item->file_path) }}">
+            <div class="gallery-item filter-item" data-type="{{ $type }}"
+                data-timestamp="{{ $timestamp }}" data-url="{{ asset('storage/' . $item->file_path) }}"
+                data-filename="{{ basename($item->file_path) }}">
 
                 <div class="select-badge"><i class="bi bi-check"></i></div>
 
@@ -510,10 +577,56 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+        function updateLogoBasedOnBackground() {
+            const hero = document.querySelector('.hero-section');
+            const logoLight = document.querySelector('.logo-light');
+            const logoDark = document.querySelector('.logo-dark');
+
+            if (!hero) return;
+
+            const bg = window.getComputedStyle(hero).backgroundImage;
+
+            const img = new Image();
+            const urlMatch = bg.match(/url\(["']?(.*?)["']?\)/);
+            if (!urlMatch) return;
+
+            img.src = urlMatch[1];
+            img.crossOrigin = "Anonymous";
+
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                let total = 0;
+                for (let i = 0; i < imageData.data.length; i += 4) {
+                    const r = imageData.data[i];
+                    const g = imageData.data[i + 1];
+                    const b = imageData.data[i + 2];
+                    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+                    total += brightness;
+                }
+                const avgBrightness = total / (img.width * img.height);
+
+                if (avgBrightness > 128) {
+                    logoLight.style.opacity = 0;
+                    logoDark.style.opacity = 1;
+                } else {
+                    logoLight.style.opacity = 1;
+                    logoDark.style.opacity = 0;
+                }
+            }
+        }
+
+        window.addEventListener('load', updateLogoBasedOnBackground);
+    </script>
+    <script>
         $(document).ready(function() {
             let selectedItems = [];
 
-            // MULTI-SELECT LOGIC
             $('.gallery-item').on('click', function() {
                 const $item = $(this);
                 $item.toggleClass('selected');
@@ -564,13 +677,13 @@
                         document.body.appendChild(link);
                         link.click();
                         document.body.removeChild(link);
-                    }, index * 400); // Jeda agar tidak diblokir browser
+                    }, index * 400);
                 });
 
                 setTimeout(() => $btn.html(originalHtml), 1000);
             });
 
-            // FILTER LOGIC
+
             $('.filter-btn').on('click', function() {
                 const target = $(this).data('target');
                 $('.filter-btn').removeClass('active');
@@ -590,7 +703,6 @@
                 }, 300);
             });
 
-            // SORT LOGIC
             $('.sort-btn').on('click', function(e) {
                 e.preventDefault();
                 const sortType = $(this).data('sort');
@@ -611,6 +723,36 @@
                 }, 300);
             });
         });
+
+        $('#btnTriggerModal').on('click', function() {
+            openGuestModal();
+        });
+
+        $('#displayNumber').on('keypress', function(e) {
+            if (e.which == 13) {
+                openGuestModal();
+            }
+        });
+
+        function openGuestModal() {
+            var phoneNumber = $('#displayNumber').val().trim();
+
+            if (phoneNumber === '') {
+                alert('Mohon isi nomor WhatsApp terlebih dahulu.');
+                $('#displayNumber').focus();
+                return;
+            }
+
+            $('#hiddenNumber').val(phoneNumber);
+            $('#previewNumber').text(phoneNumber);
+
+            var myModal = new bootstrap.Modal(document.getElementById('nameInputModal'));
+            myModal.show();
+
+            $('#nameInputModal').on('shown.bs.modal', function() {
+                $('#inputName').focus();
+            });
+        }
     </script>
 </body>
 

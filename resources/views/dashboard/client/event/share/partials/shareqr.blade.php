@@ -1,9 +1,9 @@
 <div class="col-md-7">
     <div class="card shadow-sm">
         <div class="card-body text-center">
-            <h5 class="card-title">Share via QR code</h5>
+            <h5 class="card-title">Bagikan melalui kode QR</h5>
             <p class="text-muted mb-4" style="font-size: 0.9rem;">
-                The QR code can be edited and used on table cards, signs, and more.
+                Kode QR dapat diedit dan digunakan pada kartu meja, papan tanda, dan banyak lagi.
             </p>
 
             <div class="mb-4">
@@ -20,17 +20,17 @@
             <div class="d-grid gap-2">
                 <button class="btn btn-outline-primary py-2" type="button" data-bs-toggle="modal"
                     data-bs-target="#qrCodeEditModal">
-                    Edit design
+                    Ubah design
                 </button>
 
                 @if (isset($link) && $link && $link->generate_qr_code)
                     <a href="{{ $qr_path }}" download="QR-{{ $folder->public_code ?? 'event' }}.svg"
                         class="btn btn-primary py-2">
-                        Download QR code
+                        Unduh kode QR
                     </a>
                 @else
                     <button class="btn btn-dark py-2" type="button" disabled>
-                        Download QR code
+                        Unduh kode QR
                     </button>
                 @endif
             </div>

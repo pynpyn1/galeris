@@ -9,16 +9,21 @@ use App\Models\PackageModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use ZipArchive;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class EventController extends Controller
 {
     public function show(FolderModel $folder)
     {
+        $user = auth()->user();
+
+
         if ($folder->user_id !== auth()->id()) {
             abort(403);
         }
 
-        $link = $folder->links;
+        $link = $folder->link;
 
         if (!$link) {
             $link = LinkModel::create([
@@ -34,30 +39,26 @@ class EventController extends Controller
         $image_count = $folder->photos()->count();
         $video_count = $folder->videos()->count();
 
-        $total_image_size = $folder->photos()->sum('size');
-        $total_video_size = $folder->videos()->sum('size');
-        $total_size_bytes = $total_image_size + $total_video_size;
+        $total_size_bytes = $user->usedStorageBytes();
 
 
-        function formatBytes($bytes, $precision = 1) {
-            if ($bytes === 0) return '0.0 GB';
-            $units = array('B', 'KB', 'MB', 'GB', 'TB');
-            $bytes = max($bytes, 0);
-            $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
-            $pow = min($pow, count($units) - 1);
-            $bytes /= (1 << (10 * $pow));
-            return round($bytes, $precision) . ' ' . $units[$pow];
-        }
 
-        $formatted_size = formatBytes($total_size_bytes, 1);
+
+        $formatted_size   = format_bytes($total_size_bytes, 1);
+        $storage_limit_bytes = $user->storageLimitBytes();
+        $limit_storage = $storage_limit_bytes === PHP_INT_MAX
+            ? 'Unlimited'
+            : format_bytes($storage_limit_bytes, 1);
+
 
         $upload_stats = [
             'image_count' => $image_count,
             'video_count' => $video_count,
             'total_size'  => $formatted_size,
+            'limit_storage' => $limit_storage
         ];
 
-        $can_download = $image_count >= 5 && $video_count >= 5;
+        $can_download = $image_count >= 5 && $video_count >= 1;
 
 
         $packages = PackageModel::orderBy('id')->get();
@@ -99,54 +100,66 @@ class EventController extends Controller
         $event->thumbnail = asset('storage/'.$path);
         $event->save();
 
-        return response()->json(['success' => true]);
+        return response()->json(['success' => true, 'message' => 'Berhasil mengupdate']);
     }
 
     public function download(FolderModel $folder)
     {
-        if ($folder->user_id !== auth()->id()) {
-            abort(403);
+        abort_if($folder->user_id !== auth()->id(), 403);
+
+        $user = auth()->user();
+
+        if (!$user->canDownloadHD()) {
+            return back()->with('error', 'Paket Anda belum mendukung download.');
         }
 
-        $imageCount = $folder->photos()->count();
-        $videoCount = $folder->videos()->count();
-
-        if ($imageCount < 5 || $videoCount < 5) {
-            return back()->with('error', 'Minimal 5 foto dan 5 video untuk download.');
-        }
-
-        $zipName = 'uploads_' . $folder->id . '_' . now()->format('Ymd_His') . '.zip';
+        $zipName = 'event_' . $folder->id . '_' . now()->format('Ymd_His') . '.zip';
         $zipPath = storage_path('app/public/temp/' . $zipName);
 
-        if (!Storage::disk('public')->exists('temp')) {
-            Storage::disk('public')->makeDirectory('temp');
-        }
+        Storage::disk('public')->makeDirectory('temp');
 
         $zip = new ZipArchive;
+        $zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
 
-        if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE)) {
+        $manager = new ImageManager(new Driver());
 
-            foreach ($folder->photos as $photo) {
-                $filePath = Storage::disk('public')->path($photo->file_path);
-                if (file_exists($filePath)) {
-                    $zip->addFile($filePath, 'photos/' . basename($filePath));
-                }
+
+        foreach ($folder->photos as $photo) {
+
+            $originalPath = Storage::disk('public')->path($photo->file_path);
+
+            if (!file_exists($originalPath)) continue;
+
+            if ($user->canDownloadOriginal()) {
+                $zip->addFile($originalPath, 'photos/' . basename($originalPath));
+                continue;
             }
 
-            foreach ($folder->videos as $video) {
-                $filePath = Storage::disk('public')->path($video->file_path);
-                if (file_exists($filePath)) {
-                    $zip->addFile($filePath, 'videos/' . basename($filePath));
-                }
-            }
+            // NON-PREMIUM → COMPRESS
+            $image = $manager
+                ->read($originalPath)
+                ->scale(width: 1920)   // ❗ tidak gepeng
+                ->toJpeg(75);
 
-            $zip->close();
-
-            return response()->download($zipPath)->deleteFileAfterSend(true);
+            $zip->addFromString(
+                'photos/' . pathinfo($photo->file_name, PATHINFO_FILENAME) . '.jpg',
+                (string) $image
+            );
         }
 
-        return back()->with('error', 'Gagal membuat file ZIP.');
+
+        foreach ($folder->videos as $video) {
+            $videoPath = Storage::disk('public')->path($video->file_path);
+            if (!file_exists($videoPath)) continue;
+
+            $zip->addFile($videoPath, 'videos/' . basename($videoPath));
+        }
+
+        $zip->close();
+
+        return response()->download($zipPath)->deleteFileAfterSend(true);
     }
+
 
 
 

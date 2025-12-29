@@ -18,35 +18,45 @@ class QrTemplateController extends Controller
 {
     public function index(Request $request, FolderModel $folder)
     {
-        $hasActivePackage = PurchaseModel::with('package')
+        $purchase = PurchaseModel::with('package')
             ->where('user_id', auth()->id())
             ->active()
             ->first();
 
+        $plan = $purchase?->package?->plan; // beginner | basic | pro | premium
+        $isPremium = in_array($plan, ['pro', 'premium']);
+
         $activeTemplate = $request->query('template');
 
-
-        $templates = QRTemplateModel::where('is_active', true)
+        $templatesQuery = QRTemplateModel::where('is_active', true)
             ->with(['files' => function ($q) {
                 $q->whereNull('deleted_at');
-            }])
-            ->get();
+            }]);
 
+        // 🔒 FILTER BERDASARKAN PAKET
+        if (!$isPremium) {
+            $templatesQuery->where('name_template', 'Standar');
+        }
+
+        $templates = $templatesQuery->get();
+
+        // filter via tab klik
         if ($activeTemplate) {
             $templates = $templates->where('name_template', $activeTemplate);
         }
 
         return view('dashboard.client.event.qr_template.index', [
-            'templates' => $templates,
-            'activeTemplate' => $activeTemplate,
-            'event' => $folder,
-            'hasActivePackage' => $hasActivePackage
+            'templates'       => $templates,
+            'activeTemplate'  => $activeTemplate,
+            'event'           => $folder,
+            'isPremium'       => $isPremium,
         ]);
     }
 
+
     public function download(FolderModel $folder, $templateFile)
     {
-        $link = $folder->links;
+        $link = $folder->link;
 
         if (!$link || !$link->generate_qr_code) {
             abort(404, 'QR Code belum tersedia');

@@ -86,6 +86,10 @@ class RoleGroupPermissionSeeder extends Seeder
                 'role_group_id' => 1,
                 'role_permission_id' => 17,
             ],
+            [
+                'role_group_id' => 2,
+                'role_permission_id' => 24,
+            ],
         ];
 
         DB::table('role_group_permission')->insert($post);

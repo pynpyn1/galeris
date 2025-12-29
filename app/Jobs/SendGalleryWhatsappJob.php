@@ -2,49 +2,66 @@
 
 namespace App\Jobs;
 
-use App\Models\EventGuest;
-use App\Models\GuestModel;
+use App\Models\EventGuestModel;
+use App\Services\WhatsappService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class SendGalleryWhatsappJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected GuestModel $guest;
+    protected int $guestId;
+    protected string $message;
+    protected string $imagePath;
 
-    public function __construct(GuestModel $guest)
+    public function __construct(EventGuestModel $guest, string $message, string $imagePath)
     {
-        $this->guest = $guest;
+        $this->guestId   = $guest->id;
+        $this->message   = $message;
+        $this->imagePath = $imagePath;
     }
 
-    public function handle()
+    public function handle(WhatsappService $whatsapp): void
     {
-        if ($this->guest->sent) {
+        $guest = EventGuestModel::with('client')->find($this->guestId);
+
+        if (!$guest || !$guest->client) {
+            Log::error('[WA JOB] Guest / Client tidak ditemukan', [
+                'guest_id' => $this->guestId,
+            ]);
             return;
         }
 
-        $galleryUrl = url('/gallery/' . $this->guest->folder_id);
+        if (!$guest->client->wa_session_id) {
+            Log::error('[WA JOB] wa_session_id NULL', [
+                'guest_id'  => $guest->id,
+                'client_id' => $guest->client_id,
+            ]);
+            return;
+        }
 
+        if (!$guest->number) {
+            Log::error('[WA JOB] Nomor tamu kosong', [
+                'guest_id' => $guest->id,
+            ]);
+            return;
+        }
 
-        $message = "Halo 👋\n\n"
-            . "Foto acara Anda sudah siap 📸\n\n"
-            . "Silakan akses melalui link berikut:\n"
-            . $galleryUrl . "\n\n"
-            . "Terima kasih 🙏";
-
-
-        app('whatsapp')->send(
-            $this->guest->number,
-            $message
+        $whatsapp->sendWithAttachment(
+            $guest->client->wa_session_id,
+            $guest->number,
+            $this->message,
+            $this->imagePath
         );
 
-        $this->guest->update([
+        $guest->update([
             'sent'    => true,
-            'sent_at' => now()
+            'sent_at' => now(),
         ]);
     }
 }

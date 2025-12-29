@@ -2,6 +2,11 @@
 @section('title', 'Galléris Digital Photo Album with QR Code for Guest')
 @section('content')
     <div class="">
+        <div class="justify-content-center">
+            <div class="col-12 col-sm-10 col-md-10 mb-4">
+            </div>
+        </div>
+
         @if ($folders->isEmpty())
             @if ($hasActivePackage)
                 @include('dashboard.client.partials.modal.event')
@@ -30,7 +35,10 @@
                 </div>
             @else
                 <div class="row justify-content-center">
+
                     <div class="col-12 col-sm-10 col-md-10 mb-4">
+                        @include('dashboard.client.event.partials.subscribe.card.pending')
+
                         <div class="card shadow-sm mb-4">
                             <div class="card-body d-flex flex-column align-items-center text-center">
 
@@ -55,8 +63,14 @@
             @endif
         @else
             <div class="row justify-content-center">
+                <div class="col-12 col-sm-10 col-md-10 mb-4">
+                    @include('dashboard.client.event.partials.subscribe.card.pending')
+                </div>
+            </div>
+            <div class="row justify-content-center">
                 @foreach ($folders as $f)
                     <div class="col-12 col-sm-10 col-md-10 mb-4">
+
                         <div class="card d-md-flex flex-md-row rounded border overflow-hidden shadow-sm bg-white p-0">
 
                             <div class="d-none d-md-block flex-shrink-0"
@@ -84,18 +98,18 @@
 
 
                                     @if ($f->is_trial)
-                                        <span class=" bg-primary text-light rounded-pill px-3 py-1"
+                                        <span class=" bg-primary text-light rounded px-3 py-1"
                                             style="--bs-text-opacity: .5; font-size: 0.90em">Trial Event
                                         </span>
                                     @else
-                                        <span class=" bg-primary text-light rounded-pill px-3 py-1"
+                                        <span class=" bg-primary text-light rounded px-3 py-1"
                                             style="--bs-text-opacity: .5; font-size: 0.90em"> Event
                                         </span>
                                     @endif
                                 </div>
 
                                 <div class="d-md-none mt-3">
-                                    <a href="{{ route('home.show', $f->code) }}" class="btn btn-dark w-100">
+                                    <a href="{{ route('home.show', $f->code) }}" class="btn btn-primary w-100">
                                         Open Event <i class="bi bi-arrow-right ms-2"></i>
                                     </a>
                                 </div>
@@ -103,8 +117,7 @@
 
                             <div class="d-none d-md-flex align-items-end p-4">
                                 <a href="{{ route('home.show', $f->code) }}"
-                                    class="btn text-white d-flex align-items-center justify-content-center"
-                                    style="background: #435ebf">
+                                    class="btn btn-primary text-white d-flex align-items-center justify-content-center">
                                     Open Event <i class="bi bi-arrow-right ms-2 "></i>
                                 </a>
                             </div>
@@ -123,6 +136,10 @@
 
     {{-- Toggle Setting Bot --}}
     @include('dashboard.client.partials.chatbot')
+
+    <div id="chatbotMessageWrapper" style="{{ $user->chatbot_status ? '' : 'display:none;' }}">
+        @include('dashboard.client.partials.message')
+    </div>
 
 @endsection
 
@@ -211,6 +228,7 @@
 
             const toggle = document.getElementById('waSettingToggle');
             const saveBtn = document.getElementById('saveWaSettingBtn');
+            const messageWrapper = document.getElementById('chatbotMessageWrapper');
 
             let initialValue = toggle.checked;
 
@@ -239,10 +257,13 @@
                         initialValue = toggle.checked;
                         saveBtn.disabled = true;
 
+                        if (toggle.checked) {
+                            messageWrapper.style.display = '';
+                        } else {
+                            messageWrapper.style.display = 'none';
+                        }
+
                         showToast(data.message, 'success');
-
-
-
                     })
                     .catch(err => {
                         showToast(err.message, 'error');
@@ -251,6 +272,7 @@
             });
         });
     </script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 

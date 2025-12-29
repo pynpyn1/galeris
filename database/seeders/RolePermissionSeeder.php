@@ -95,6 +95,38 @@ class RolePermissionSeeder extends Seeder
                 'slug' => 'manage_qrtemplate'
             ],
 
+            // Client
+            [
+                'name' => 'Download uploads',
+                'slug' => 'download_uploads'
+            ],
+            [
+                'name' => 'Qr Code Template',
+                'slug' => 'qrcode_template'
+            ],
+            [
+                'name' => 'Live Gallery Wall',
+                'slug' => 'gallery_wall'
+            ],
+            [
+                'name' => 'Upload HD Resolution',
+                'slug' => 'upload_hd_resolution'
+            ],
+            [
+                'name' => 'Upload Original Resolution',
+                'slug' => 'upload_original_resolution'
+            ],
+            [
+                'name' => 'Edit Qr Code',
+                'slug' => 'edit_qr_code'
+            ],
+
+            // Client
+            [
+                'name' => 'Upload Video',
+                'slug' => 'upload_video'
+            ],
+
         ];
 
         DB::table('role_permission')->insert($posts);

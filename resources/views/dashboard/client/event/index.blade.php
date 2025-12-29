@@ -64,7 +64,6 @@
 
         .filepond--root {
             max-height: none;
-            font-family: inherit;
         }
 
         .event-upload .filepond--panel-root {
@@ -131,6 +130,7 @@
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
                     onload: () => {
+
                         location.reload();
                     }
                 }

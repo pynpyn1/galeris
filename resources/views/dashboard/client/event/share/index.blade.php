@@ -13,8 +13,10 @@
         {{-- Remind Guest --}}
         @include('dashboard.client.event.share.partials.remind')
 
-
-
+        {{-- Import Whatsapp --}}
+        <section class="col-md-7 mt-4" id="importWhatsappSection">
+            @include('dashboard.client.event.share.partials.import')
+        </section>
 
 
 
@@ -29,6 +31,67 @@
 
 @push('scripts')
     <script src="https://unpkg.com/qr-code-styling@1.6.0/lib/qr-code-styling.js"></script>
+    <script>
+        @if (session('success'))
+            showToast(@json(session('success')), 'success');
+        @endif
+
+        @if (session('error'))
+            showToast(@json(session('error')), 'error');
+        @endif
+
+        @if (session('warning'))
+            showToast(@json(session('warning')), 'warning');
+        @endif
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('remindGuestToggle');
+            const saveBtn = document.getElementById('saveRemindBtn');
+            const importSection = document.getElementById('importWhatsappSection');
+
+            if (!toggle || !saveBtn || !importSection) return;
+
+            // Inisialisasi hide/show import
+            importSection.style.display = toggle.checked ? 'block' : 'none';
+
+            const initialState = toggle.checked;
+
+            toggle.addEventListener('change', function() {
+                saveBtn.disabled = toggle.checked === initialState;
+                importSection.style.display = toggle.checked ? 'block' : 'none';
+            });
+
+            saveBtn.addEventListener('click', function() {
+                saveBtn.disabled = true;
+
+                fetch("{{ route('home.remind', $event->public_code) }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            send_wa: toggle.checked ? 1 : 0
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            showToast(data.message, 'success');
+                            location.reload();
+                        } else {
+                            saveBtn.disabled = false;
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        showToast('Gagal menyimpan pengaturan', 'error');
+                        saveBtn.disabled = false;
+                    });
+            });
+        });
+    </script>
     <script>
         const qrData = "{{ $url }}";
 
@@ -104,6 +167,7 @@
 
         document.querySelectorAll('#qr-design-form input, #qr-design-form select').forEach(el => {
             el.addEventListener('change', updateQR);
+            // showToast("Berhasil mengupdate", 'success');
         });
 
 
@@ -174,10 +238,12 @@
                     .then(res => res.json())
                     .then(res => {
                         if (res.success) {
+                            showToast("Berhasil mengupdate", 'success');
                             document.getElementById("current-qr-code").src = res.qr_url + '?' + Date
                                 .now();
                             bootstrap.Modal.getInstance(document.getElementById('qrCodeEditModal'))
                                 .hide();
+
                         }
                     });
             });
@@ -226,6 +292,25 @@
                         alert('Failed to save setting');
                         saveBtn.disabled = false;
                     });
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const copyButton = document.getElementById('copy-button');
+            const shareLinkInput = document.getElementById('share-link');
+
+            copyButton.addEventListener('click', function() {
+                shareLinkInput.select();
+                shareLinkInput.setSelectionRange(0, 99999);
+
+                navigator.clipboard.writeText(shareLinkInput.value).then(() => {
+                    showToast('Link berhasil disalin!', 'success');
+                }).catch(err => {
+                    console.error('Gagal menyalin: ', err);
+                    showToast('Gagal menyalin link', 'error');
+                });
             });
         });
     </script>

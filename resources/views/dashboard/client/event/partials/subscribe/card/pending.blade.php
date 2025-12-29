@@ -1,4 +1,4 @@
-@if ($pendingPurchase)
+@if ($unpaidPurchase)
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4"
         style="background: linear-gradient(135deg, #fff7ed 0%, #ffffff 100%);
                border-left: 4px solid #f59e0b !important;">
@@ -28,13 +28,13 @@
                     <p class="text-secondary mb-3 small lh-base">
                         Anda sudah memilih paket
                         <span class="fw-bold text-dark">
-                            {{-- {{ $pendingPurchase->package->package_name }} --}}
+                            {{ $unpaidPurchase->package->package_name }}
                         </span>.
                         Silakan selesaikan pembayaran untuk mengaktifkan langganan.
                     </p>
 
                     <div class="d-flex gap-2">
-                        <a href="{{ route('home.checkout.show', $pendingPurchase) }}"
+                        <a href="{{ route('home.checkout.show', $unpaidPurchase) }}"
                             class="btn btn-warning btn-sm px-4 py-2 rounded-3 fw-semibold shadow-sm">
                             Lanjutkan Pembayaran
                         </a>

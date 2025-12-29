@@ -292,7 +292,9 @@ class PurchaseController extends Controller
                 'snap_status'           => 'success',
                 'subscription_start'    => $start,
                 'subscription_end'      => $end,
+                'next_payment_due_at'   => $end,
                 'subscription_status'   => 'active',
+                'auto_renew'            => true,
             ]);
 
             return response()->json(['message' => 'Payment success']);

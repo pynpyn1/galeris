@@ -4,7 +4,8 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div class="logo">
                     <a href="{{ url('/') }}">
-                        <img src="{{ asset('asset/img/logo.png') }}" alt="Logo" style="height: 60px; width: auto;">
+                        <img src="{{ asset('asset/img/GALLERIS_LOGO.png') }}" alt="Logo"
+                            style="height: 70px; width: auto;">
                     </a>
                 </div>
                 <div class="toggler">
@@ -37,6 +38,35 @@
                     </li>
                 @endif
 
+                {{-- Upload Video Photo --}}
+                @if (Auth::check() && (Auth::user()->hasPermissionTo('upload_photo') || Auth::user()->hasPermissionTo('upload_video')))
+                    <li
+                        class="sidebar-item has-sub {{ request()->routeIs('home.photo.*', 'home.video.*') ? 'active' : '' }}">
+                        <a href="#" class="sidebar-link">
+                            <i class="bi bi-cloud-arrow-up"></i>
+                            <span>Manage Content</span>
+                        </a>
+                        <ul class="submenu">
+                            @if (Auth::user()->hasPermissionTo('upload_photo'))
+                                <li class="submenu-item {{ request()->routeIs('home.photo.*') ? 'active' : '' }}">
+                                    <a href="{{ route('home.photo.index', $event->public_code) }}">
+                                        <i class="bi bi-image"></i> Photo
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if (Auth::user()->hasPermissionTo('upload_video'))
+                                <li class="submenu-item {{ request()->routeIs('home.video.*') ? 'active' : '' }}">
+                                    <a href="{{ route('home.video.index', $event->public_code) }}">
+                                        <i class="bi bi-camera-video"></i> Video
+                                    </a>
+                                </li>
+                            @endif
+                        </ul>
+                    </li>
+                @endif
+
+
                 @if (Auth::check() && Auth::user()->hasPermissionTo('dashboard_client'))
                     <li class="sidebar-item {{ request()->routeIs('home.share') ? 'active' : '' }}">
                         <a href="{{ route('home.share', $event->public_code) }}" class="sidebar-link">
@@ -65,7 +95,8 @@
                 @endif
                 @if (Auth::check() && Auth::user()->hasPermissionTo('dashboard_client'))
                     <li class="sidebar-item">
-                        <a href="{{ route('home.share', $event->public_code) }}" class="sidebar-link">
+                        <a href="{{ route('provide.photo', $event->link->slug) }}" target="_blank"
+                            class="sidebar-link">
                             <i class="bi bi-arrow-up-right"></i>
                             <span>Go to gallery</span>
                         </a>
@@ -74,15 +105,13 @@
 
                 @if (Auth::check() && Auth::user()->hasPermissionTo('dashboard_client'))
                     <li class="sidebar-item">
-                        <a href="{{ route('home.share', $event->public_code) }}" class="sidebar-link">
+                        <a href="{{ route('livewall.photo', $event->link->slug) }}" target="_blank"
+                            class="sidebar-link">
                             <i class="bi bi-arrow-up-right"></i>
                             <span>Live gallery wall</span>
                         </a>
                     </li>
                 @endif
-
-
-
 
             </ul>
 

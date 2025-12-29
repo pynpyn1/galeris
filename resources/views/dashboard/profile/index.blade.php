@@ -46,14 +46,9 @@
                     </div>
 
                     <div class="mb-3">
-                        <label>Nama Terlibat </label>
-                        <input type="text" placeholder="Man Engaged & Woman Engaged" name="name_engaged"
-                            class="form-control" value="{{ old('name_engaged', $user->name_engaged) }}">
-                    </div>
-
-                    <div class="mb-3">
                         <label>Email <code>*</code></label>
-                        <input type="email" name="email" class="form-control" value="{{ old('email', $user->email) }}">
+                        <input type="email" name="email" class="form-control" value="{{ old('email', $user->email) }}"
+                            disabled>
                     </div>
 
                     <div class="mb-3">
@@ -73,11 +68,6 @@
                     @method('PUT')
 
                     <div class="mb-3">
-                        <label>Password Lama</label>
-                        <input type="password" name="current_password" class="form-control">
-                    </div>
-
-                    <div class="mb-3">
                         <label>Password Baru</label>
                         <input type="password" name="new_password" class="form-control">
                     </div>
@@ -87,10 +77,9 @@
                         <input type="password" name="new_password_confirmation" class="form-control">
                     </div>
 
-                    <button class="btn btn-warning w-100">Update Password</button>
+                    <button class="btn btn-outline-primary w-100">Update Password</button>
                 </form>
             </div>
         </div>
-
     </div>
 @endsection

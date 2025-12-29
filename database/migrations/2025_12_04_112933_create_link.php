@@ -18,8 +18,6 @@ return new class extends Migration
             $table->foreignId('client_id')->constrained('users')->cascadeOnDelete();
             $table->string('slug')->unique();
             $table->boolean('send_wa')->default(0);
-            $table->boolean('wa_sent')->default(0);
-            $table->timestamp('wa_sent_at')->nullable();
             $table->string('generate_qr_code')->nullable();
             $table->timestamps();
             $table->softDeletes();

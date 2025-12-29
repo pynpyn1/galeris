@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('package', function (Blueprint $table) {
             $table->id();
-            $table->enum('plan', ['basic', 'pro', 'premium'])->index();
+            $table->enum('plan', ['beginner','basic', 'pro', 'premium'])->index();
             $table->string('package_name');
             $table->text('package_desc');
             $table->json('feature');

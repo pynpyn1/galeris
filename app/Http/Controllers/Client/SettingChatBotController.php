@@ -53,13 +53,16 @@ class SettingChatBotController extends Controller
     {
         $chatbot = ChatBotModel::withTrashed()->findOrFail($id);
 
+        if (!auth()->user()->canEditChatbot()) {
+            return back()->with('error', 'Paket Anda belum mendukung fitur ini.');
+        }
+
         $request->validate([
-            'user_id' => 'required|exists:users,id',
             'message' => 'required|string',
         ]);
 
         $chatbot->update([
-            'user_id' => $request->user_id,
+            'user_id' => Auth::id(),
             'message' => $request->message,
         ]);
 
@@ -68,6 +71,6 @@ class SettingChatBotController extends Controller
             return redirect()->route('chatbot.index')->with('success', 'ChatBot berhasil diperbarui dan dikembalikan.');
         }
 
-        return redirect()->route('chatbot.index')->with('success', 'ChatBot berhasil diperbarui.');
+        return redirect()->route('home.index')->with('success', 'Message berhasil diperbarui.');
     }
 }

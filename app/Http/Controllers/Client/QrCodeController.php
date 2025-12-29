@@ -120,7 +120,9 @@ class QrCodeController extends Controller
             $chatbot = \App\Models\ChatBotModel::where('user_id', $folder->user_id)->first();
             $caption = $chatbot
                 ? str_replace(['{name}', '{url}'], [$user->name, $fullUrl], $chatbot->message)
-                : "Halo {$user->name}, QR kamu sudah dibuat!\n\n{$fullUrl}";
+                : "Halo Kak {name}, Terima kasih telah hadir dan memeriahkan acara kami!
+Foto-foto keseruan acara tadi sudah bisa dilihat dan diunduh. Yuk, cek momen-momennya di galeri berikut: {url}
+Selamat menikmati kenangannya!";
 
             $response = Http::attach(
                 'file',

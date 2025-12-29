@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -40,10 +42,26 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        auth()->logout();
+        $user = Auth::user();
+
+
+        if ($user && !empty($user->wa_session_id)) {
+            try {
+                Http::timeout(5)->post(
+                    config('app.whatsapp_api_url') . '/logout',
+                    [
+                        'wa_session_id' => $user->wa_session_id,
+                    ]
+                );
+            } catch (\Throwable $e) {
+                Log::warning('WA logout skipped / failed: ' . $e->getMessage());
+            }
+        }
+
+
+        Auth::logout();
 
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
 
         return redirect('/');

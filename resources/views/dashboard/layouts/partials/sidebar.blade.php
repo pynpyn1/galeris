@@ -4,7 +4,8 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div class="logo">
                     <a href="{{ url('/') }}">
-                        <img src="{{ asset('asset/img/logo.png') }}" alt="Logo" style="height: 60px; width: auto;">
+                        <img src="{{ asset('asset/img/GALLERIS_LOGO.png') }}" alt="Logo"
+                            style="height: 70px; width: auto;">
                     </a>
                 </div>
                 <div class="toggler">

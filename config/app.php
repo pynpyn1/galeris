@@ -56,7 +56,7 @@ return [
     */
 
     'url' => env('APP_URL', 'http://localhost'),
-
+    'whatsapp_api_url' => env('WHATSAPP_API_URL', env('APP_URL')),
     'asset_url' => env('ASSET_URL'),
 
     /*
@@ -168,6 +168,7 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+
     ])->toArray(),
 
     /*

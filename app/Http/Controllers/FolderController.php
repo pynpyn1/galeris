@@ -65,7 +65,7 @@ class FolderController extends Controller
 
 
 
-            $links = $folder->links()->withTrashed()->get();
+            $links = $folder->link()->withTrashed()->get();
             foreach ($links as $link) {
                 if ($link->trashed()) $link->restore();
             }
@@ -86,7 +86,7 @@ class FolderController extends Controller
         ]);
 
         $photos = $folder->photos()->withTrashed()->get();
-        $links  = $folder->links()->withTrashed()->get();
+        $links  = $folder->link()->withTrashed()->get();
 
         if ($oldVisibility === 'public' && $request->visibility === 'private') {
 
@@ -136,7 +136,7 @@ class FolderController extends Controller
         }
 
 
-        $links = $folder->links()->withTrashed()->get();
+        $links = $folder->link()->withTrashed()->get();
 
         foreach ($links as $link) {
 

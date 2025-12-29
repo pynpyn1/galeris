@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('folder', function (Blueprint $table) {
             $table->id();
-                $table->string('public_code', 10)->unique();
+            $table->string('public_code', 10)->unique();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('client_id')->constrained('users')->cascadeOnDelete();
             $table->string('name');

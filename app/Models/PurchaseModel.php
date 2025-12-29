@@ -30,6 +30,9 @@ class PurchaseModel extends Model
         'snap_status',
         'snap_amount',
         'payment_reference',
+        'reminder_sent',
+        'expired_email_sent',
+        'invoice_email_sent',
         'payment_proof',
         'paid_at',
         'note',
@@ -39,6 +42,7 @@ class PurchaseModel extends Model
         'subscription_start' => 'datetime',
         'subscription_end'   => 'datetime',
         'paid_at'            => 'datetime',
+        'next_payment_due_at'=> 'datetime',
     ];
 
     protected static function booted()
@@ -48,7 +52,17 @@ class PurchaseModel extends Model
             if (!$purchase->invoice_number) {
                 $purchase->invoice_number = self::generateInvoiceNumber();
             }
+        });
 
+        static::updated(function ($purchase) {
+
+        if (
+            $purchase->isDirty('payment_status') &&
+            $purchase->payment_status === 'paid' &&
+            $purchase->subscription_status === 'active'
+        ) {
+            FolderModel::upgradeTrialFolders($purchase->user_id);
+        }
     });
     }
 

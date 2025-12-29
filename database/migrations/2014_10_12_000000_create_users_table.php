@@ -13,7 +13,9 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->string('discord_id')->nullable()->unique();
             $table->string('google_id')->nullable()->unique();
+            $table->string('facebook_id')->nullable()->unique();
             $table->string('name');
             $table->string('phone')->nullable();
             $table->string('email')->unique();
@@ -22,6 +24,7 @@ return new class extends Migration
             $table->string('profile_photo_path', 2048)->nullable();
             $table->foreignId('role_group_id')->nullable()->constrained('role_group')->onDelete('set null');
             $table->boolean('chatbot_status')->default(0);
+            $table->uuid('wa_session_id')->nullable()->unique();
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();

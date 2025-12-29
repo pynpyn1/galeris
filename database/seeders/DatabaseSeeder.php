@@ -24,7 +24,11 @@ class DatabaseSeeder extends Seeder
             RoleGroupPermissionSeeder::class,
             UserSeeder::class,
             ChatBotSeeder::class,
+            // FeatureSeeder::class,
+            // FolderPackageSeeder::class,
+            // PackageFeatureSeeder::class,
             FolderPackageSeeder::class,
+
         ]);
     }
 }

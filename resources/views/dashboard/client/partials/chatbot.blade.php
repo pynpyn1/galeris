@@ -5,7 +5,7 @@
 
                 <!-- Header -->
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <h5 class="mb-0">Whatsapp Settings</h5>
+                    <h5 class="mb-0">Pengaturan Whatsapp </h5>
 
                     <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" id="waSettingToggle"
@@ -15,9 +15,9 @@
 
                 <!-- Description -->
                 <p class="text-muted" style="font-size: 0.9rem;">
-                    Enable this feature to connect your WhatsApp via QR scan
-                    and use it as an automated messaging bot.
-                    Messages can be customized to your needs and will be sent to guests.
+                    Aktifkan fitur ini untuk menghubungkan WhatsApp Anda melalui pemindaian QR
+                    dan gunakan sebagai bot pesan otomatis.
+                    Pesan dapat disesuaikan dengan kebutuhan Anda dan akan dikirimkan kepada tamu.
                 </p>
 
 

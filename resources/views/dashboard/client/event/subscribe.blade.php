@@ -4,9 +4,11 @@
 
 @section('content')
     <div class="container py-5">
+
         @include('dashboard.client.event.partials.subscribe.card.pending')
         @include('dashboard.client.event.partials.subscribe.card.verification')
         @include('dashboard.client.event.partials.subscribe.card.active')
+
         {{-- Header --}}
         <div class="text-center mb-5">
             <h1 class="fw-bold">
@@ -21,10 +23,13 @@
 
 
         {{-- Package Cards --}}
+        {{-- Ubah align-items-stretch agar tinggi card sama rata --}}
         <div class="row justify-content-center align-items-stretch g-4">
 
             @foreach ($packages->sortBy('price') as $package)
-                <div class="col-12 col-md-4">
+                {{-- PERUBAHAN DI SINI: Menggunakan col-lg-3 agar menjadi 4 kolom di layar besar --}}
+                <div class="col-12 col-md-6 col-lg-3">
+
                     @php
                         $isActivePackage = $hasActivePackage && $hasActivePackage->package_id === $package->id;
                         $isLowerPackage = $hasActivePackage && $package->price < $hasActivePackage->package->price;
@@ -42,12 +47,9 @@
                             </div>
                         @endif
 
-
-
                         <div class="card-body d-flex flex-column p-4 text-center">
-                            @if ($pendingPurchase)
-                                <a href="{{ route('home.checkout.show', $pendingPurchase) }}"
-                                    class="position-relative me-3">
+                            @if ($unpaidPurchase)
+                                <a href="{{ route('home.checkout.show', $unpaidPurchase) }}" class="position-relative me-3">
                                     <i class="bi bi-wallet2 fs-5"></i>
                                     <span
                                         class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
@@ -68,21 +70,21 @@
                                 class="fw-bolder mb-4
                         {{ $package->plan === 'pro' ? 'text-white' : 'text-dark' }}">
                                 Rp{{ number_format($package->price, 0, ',', '.') }}
-                                <span class="fs-6 fw-normal opacity-75">/bulan</span>
+                                <span class="fs-6 fw-normal opacity-75">/bln</span> {{-- Disingkat agar muat --}}
                             </h2>
 
                             {{-- Description --}}
-                            <p class="mb-4 text-start">
+                            <p class="mb-4 text-start small"> {{-- Tambah class small agar muat --}}
                                 {{ $package->package_desc }}
                             </p>
 
                             {{-- Features --}}
-                            <ul class="list-unstyled text-start mb-auto">
+                            <ul class="list-unstyled text-start mb-auto small"> {{-- Tambah class small --}}
                                 @foreach ($package->feature as $feature)
                                     <li class="mb-2 d-flex align-items-start">
                                         <i
                                             class="bi bi-check-circle-fill me-2
-                                    {{ $package->plan === 'pro' ? 'text-light' : 'text-primary' }}"></i>
+                                    {{ $package->plan === 'pro' ? 'text-light' : 'text-success' }}"></i>
                                         <span>{{ $feature }}</span>
                                     </li>
                                 @endforeach
@@ -99,17 +101,16 @@
                                     @if ($hasActivePackage && !$isUpgradeable) disabled @endif>
                                     @if ($isActivePackage)
                                         <i class="bi bi-bag-check-fill me-2"></i>
-                                        Paket Aktif
+                                        Aktif
                                     @elseif ($hasActivePackage && $isLowerPackage)
                                         <i class="bi bi-bag-check-fill me-2"></i>
-                                        Tidak Bisa Downgrade
+                                        No Downgrade
                                     @elseif ($hasActivePackage && $isSamePackage)
                                         <i class="bi bi-dash-circle me-2"></i>
-                                        Paket Saat Ini
+                                        Paket Ini
                                     @else
                                         <i class="bi bi-bag-check-fill me-2"></i>
-
-                                        {{ $hasActivePackage ? 'Upgrade Paket' : 'Pilih ' . $package->package_name }}
+                                        {{ $hasActivePackage ? 'Upgrade' : 'Pilih' }}
                                     @endif
                                 </button>
                             </form>
@@ -133,8 +134,9 @@
 
 @push('styles')
     <style>
+        /* Mengurangi scale sedikit agar tidak bertabrakan karena kolom makin sempit */
         .scale-pro {
-            transform: scale(1.05);
+            transform: scale(1.03);
             z-index: 2;
         }
 
@@ -154,7 +156,9 @@
         }
     </style>
 @endpush
+
 @push('scripts')
+    {{-- Script tetap sama --}}
     <script>
         @if (session('success'))
             showToast(@json(session('success')), 'success');
@@ -168,11 +172,11 @@
             showToast(@json(session('warning')), 'warning');
         @endif
     </script>
-    @if ($pendingPurchase)
+    @if ($unpaidPurchase)
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 showToast(
-                    'Anda masih memiliki pembayaran yang belum selesai. Silakan lanjutkan pembayaran.',
+                    'Anda masih memiliki pembayaran yang belum selesai.',
                     'warning',
                     7000
                 );

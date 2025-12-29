@@ -15,5 +15,14 @@ class PackageModel extends Model
         'feature' => 'array',
     ];
 
+    public function features()
+    {
+        return $this->belongsToMany(
+            FeaturesModel::class,
+            'package_features',
+            'package_id',
+            'feature_id'
+        )->withPivot('is_enabled');
+    }
 
 }

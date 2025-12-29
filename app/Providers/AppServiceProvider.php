@@ -26,19 +26,19 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
          if (app()->environment('local')) {
-            URL::forceScheme('https');
+            URL::forceScheme('http');
         }
-        View::composer('*', function ($view) {
-            $pendingPurchase = null;
+        // View::composer('*', function ($view) {
+        //     $pendingPurchase = null;
 
-            if (auth()->check()) {
-                $pendingPurchase = PurchaseModel::where('user_id', auth()->id())
-                    ->where('payment_status', 'pending')
-                    ->latest()
-                    ->first();
-            }
+        //     if (auth()->check()) {
+        //         $pendingPurchase = PurchaseModel::where('user_id', auth()->id())
+        //             ->where('payment_status', 'pending')
+        //             ->latest()
+        //             ->first();
+        //     }
 
-            $view->with('pendingPurchase', $pendingPurchase);
-        });
+        //     $view->with('pendingPurchase', $pendingPurchase);
+        // });
     }
 }

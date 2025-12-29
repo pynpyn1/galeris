@@ -12,12 +12,13 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('wa:send-reminder')->dailyAt('00:00');
         $schedule->command('gallery:send-reminder')->dailyAt('00.00');
         $schedule->command('folder:delete-expired-trial')->dailyAt('00.00');
         $schedule->command('purchase:expire-pending-purchases')->dailyAt('00.00');
         $schedule->command('purchase:expire-subscribe-purchases')->dailyAt('00.00');
         $schedule->command('discount:disable-expired-discounts')->dailyAt('00.00');
+        $schedule->command('subscriptions:check')->dailyAt('00.00');
+
     }
 
     /**

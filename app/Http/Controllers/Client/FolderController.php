@@ -92,6 +92,17 @@ class FolderController extends Controller
     {
         $user = Auth::user();
 
+        if (!$user->activePurchase()->exists()) {
+
+            $trialFolderCount = FolderModel::where('user_id', $user->id)
+                ->where('is_trial', 1)
+                ->count();
+
+            if ($trialFolderCount >= 1) {
+                abort(403, 'Free user hanya boleh memiliki 1 event');
+            }
+        }
+
         $hasActivePackage = PurchaseModel::where('user_id', $user->id)
             ->where('payment_status', 'paid')
             ->whereNotNull('subscription_start')
@@ -166,12 +177,12 @@ class FolderController extends Controller
         if ($folder->trashed()) {
             $folder->restore();
 
-             // Restore ALL links but DO NOT restore photos
-        $links = $folder->links()->withTrashed()->get();
+
+        $links = $folder->link()->withTrashed()->get();
 
         foreach ($links as $link) {
             if ($link->trashed()) {
-                $link->restore();  // <-- ini akan menghapus deleted_at
+                $link->restore();
             }
         }
             return redirect()->route('folder.client.index')->with('success', 'Folder berhasil di-restore.');
@@ -190,7 +201,7 @@ class FolderController extends Controller
         ]);
 
         $photos = $folder->photos()->withTrashed()->get();
-        $links  = $folder->links()->withTrashed()->get();
+        $links  = $folder->link()->withTrashed()->get();
 
         if ($oldVisibility === 'public' && $request->visibility === 'private') {
 
@@ -239,7 +250,7 @@ class FolderController extends Controller
             $photo->delete();
         }
 
-        foreach ($folder->links()->withTrashed()->get() as $link) {
+        foreach ($folder->link()->withTrashed()->get() as $link) {
 
             if ($link->generate_qr_code && file_exists(public_path('qr/' . $link->generate_qr_code))) {
                 unlink(public_path('qr/' . $link->generate_qr_code));

@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('folder_id')->constrained('folder')->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('client_id')->constrained('users')->cascadeOnDelete()->cascadeOnUpdate();
-            $table->string('number');
+            $table->string('name');
+            $table->bigInteger('number');
             $table->boolean('sent')->default(0);
             $table->date('sent_at')->nullable();
             $table->timestamps();

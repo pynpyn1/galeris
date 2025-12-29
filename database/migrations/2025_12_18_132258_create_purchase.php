@@ -23,12 +23,17 @@ return new class extends Migration
             $table->enum('billing_cycle', ['monthly', 'yearly'])->default('monthly');
             $table->timestamp('subscription_start')->nullable();
             $table->timestamp('subscription_end')->nullable();
+            $table->timestamp('next_payment_due_at')->nullable();
+            $table->boolean('auto_renew')->default(false);
+            $table->integer('reminder_sent')->default(0);
+            $table->boolean('expired_email_sent')->default(false);
+            $table->boolean('invoice_email_sent')->default(false);
             $table->enum('subscription_status', ['active', 'nonactive'])->default('nonactive');
             $table->enum('payment_method', ['manual', 'midtrans'])->default('manual');
             $table->string('snap_token')->nullable();
             $table->string('snap_status')->nullable();
             $table->integer('snap_amount')->nullable();
-            $table->enum('payment_status', [ 'noaction','unpaid','waiting_verification','paid','expired', 'rejected'])->default('unpaid');
+            $table->enum('payment_status', ['unpaid','waiting_verification','paid','expired', 'rejected'])->default('unpaid');
             $table->string('payment_reference')->nullable();
             $table->timestamp('paid_at')->nullable();
             $table->string('payment_proof')->nullable();

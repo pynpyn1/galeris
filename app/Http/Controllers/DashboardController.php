@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ChatBotModel;
 use App\Models\FolderModel;
 use App\Models\LinkModel;
 use App\Models\PackageModel;
@@ -17,16 +18,12 @@ class DashboardController extends Controller
     public function index()
     {
         $user = Auth::user();
-
-        // if (is_null($user->phone) || $user->phone === '') {
-        //     return redirect()->route('auth.phone');
-        // }
-
         $CLIENT_PERMISSION = 'dashboard_client';
 
 
         if ($user->hasPermissionTo($CLIENT_PERMISSION)) {
             $packages = PackageModel::orderBy('id')->get();
+            $chatbot = ChatBotModel::where('user_id', Auth::id())->first();
 
             $folders = FolderModel::where('user_id', Auth::id())
             ->with([
@@ -55,15 +52,20 @@ class DashboardController extends Controller
                 ];
             });
 
-        $hasActivePackage = PurchaseModel::where('user_id', auth()->id())
-        ->where('payment_status', 'paid')
-        ->whereNotNull('subscription_start')
-        ->where('subscription_end', '>', now())
-        ->exists();
+            $hasActivePackage = PurchaseModel::with('package')
+                ->where('user_id', Auth::id())
+                ->active()
+                ->first();
+
+            $unpaidPurchase = PurchaseModel::with('package')
+            ->where('user_id', Auth::id())
+            ->where('payment_status', 'unpaid')
+            ->orderBy('created_at', 'desc')
+            ->first();
 
 
 
-        return view('dashboard.client.index', compact('folders', 'packages', 'user', 'hasActivePackage'));
+        return view('dashboard.client.index', compact('folders','chatbot', 'packages', 'user', 'hasActivePackage', 'unpaidPurchase'));
 
         } else {
             $totalClients = User::where('role_group_id', 1)->count();
@@ -98,38 +100,41 @@ class DashboardController extends Controller
         }
     }
 
-    public function subscribe()
+   public function subscribe()
     {
-        $verificationPurchase = null;
-        $pendingPurchase = null;
-
+        $userId = auth()->id();
 
         $hasActivePackage = PurchaseModel::with('package')
-            ->where('user_id', auth()->id())
+            ->where('user_id', $userId)
             ->active()
             ->first();
 
-        if (auth()->check()) {
-            $purchase = PurchaseModel::where('user_id', auth()->id())
-                ->whereIn('payment_status', ['unpaid', 'waiting_verification'])
-                ->latest()
-                ->first();
+        $unpaidPurchase = PurchaseModel::with('package')
+            ->where('user_id', Auth::id())
+            ->where('payment_status', 'unpaid')
+            ->orderBy('created_at', 'desc')
+            ->first();
 
-            if ($purchase?->payment_status === 'waiting_verification') {
-                $verificationPurchase = $purchase;
-            }
-
-            if ($purchase?->payment_status === 'unpaid') {
-                $pendingPurchase = $purchase;
-            }
-        }
+        $verificationPurchase = PurchaseModel::with('package')
+            ->withTrashed()
+            ->where('user_id', $userId)
+            ->where('payment_status', 'waiting_verification')
+            ->orderBy('created_at', 'desc')
+            ->first();
 
         $packages = PackageModel::where('is_active', true)
             ->orderBy('price', 'asc')
             ->get();
 
-        return view('dashboard.client.event.subscribe',compact('packages', 'verificationPurchase', 'pendingPurchase', 'hasActivePackage'));
+        return view('dashboard.client.event.subscribe', [
+            'packages' => $packages,
+            'verificationPurchase' => $verificationPurchase,
+            'hasActivePackage' => $hasActivePackage,
+            'unpaidPurchase' => $unpaidPurchase
+        ]);
     }
+
+
 
 
 

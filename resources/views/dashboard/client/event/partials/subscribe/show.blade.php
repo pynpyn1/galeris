@@ -7,7 +7,7 @@
 @section('content')
     <div class="container-fluid ">
         <div class="row justify-content-center">
-            <div class="col-12 col-xl-10 col-xxl-9">
+            <div class="col-12 col-xl-12 col-xxl-11">
 
                 <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
                     <div class="row g-0">
@@ -67,7 +67,7 @@
                                 <div class="card border-0 rounded-4 shadow-sm mb-4">
                                     <div class="card-body p-4">
                                         <div class="row align-items-center text-center text-md-start">
-                                            <div class="col-md-7">
+                                            <div class="col-md-6">
                                                 <h6 class="text-muted small text-uppercase fw-bold mb-2">Paket Langganan
                                                 </h6>
                                                 <h4 class="fw-bold text-dark">{{ $purchase->package->package_name }}</h4>
