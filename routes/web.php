@@ -14,6 +14,7 @@ use App\Http\Controllers\API\URLController as ApiURLController;
 use App\Http\Controllers\API\UsersController as ApiUserController;
 use App\Http\Controllers\ChatBotController;
 use App\Http\Controllers\API\ChatBotController as ApiChatBotController;
+use App\Http\Controllers\API\PackageController as APIPackageController;
 use App\Http\Controllers\API\VideoController as ApiVideoController;
 use App\Http\Controllers\API\QrTemplateController as ApiQrTemplateController;
 use App\Http\Controllers\ConnectController;
@@ -257,10 +258,11 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('package')->controller(PackageController::class)->middleware(['permission:manage_package'])->name('package.')->group(function() {
             Route::get('/', 'index')->name('index');
             Route::get('/create', 'create')->name('create');
+            Route::post('/store', 'store')->name('store');
             Route::get('/edit/{package}', 'edit')->name('edit');
             Route::put('/update/{package}', 'update')->name('update');
-            Route::delete('/delete/{package}', 'destroy')->name('destroy');
         });
+        Route::get('/data', [APIPackageController::class, 'data'])->name('package.data');
 
         // Manage Discount
         Route::prefix('discount')->controller(DiscountController::class)->middleware(['permission:manage_discount'])->name('discount.')->group(function() {
@@ -351,7 +353,7 @@ Route::middleware(['auth', 'phone'])->group(function () {
             Route::get('/', 'index')->name('index');
             Route::post('/upload', 'store')->name('store');
             Route::delete('/all', 'destroyAll')->name('destroyAll');
-            Route::delete('/{photo}', 'destroy')->name('destroy');
+            Route::delete('/{video}', 'destroy')->name('destroy');
         });
     });
 
@@ -364,6 +366,11 @@ Route::middleware(['auth', 'phone'])->group(function () {
 Route::get('/', function () {
     return view('layout.welcome');
 });
+
+Route::get('/upload-too-large', function () {
+    return redirect()->back()->with('error', 'Ukuran file terlalu besar. Maksimal 1Gib.');
+});
+
 
 // privacy-policy - Latif
 // faq - Latif

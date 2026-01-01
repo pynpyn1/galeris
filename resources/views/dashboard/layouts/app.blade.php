@@ -98,6 +98,19 @@
             transform: translateY(0);
         }
     }
+
+    .sidebar-wrapper {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        overflow-y: auto;
+        padding-bottom: 1rem;
+    }
+
+    .sidebar-footer {
+        margin-top: auto;
+        flex-shrink: 0;
+    }
 </style>
 
 <body>

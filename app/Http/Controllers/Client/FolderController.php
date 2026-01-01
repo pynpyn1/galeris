@@ -150,7 +150,7 @@ class FolderController extends Controller
         ]);
 
         return redirect()
-            ->route('home.index')
+            ->route('home.show', $folder->public_code)
             ->with(
                 'success',
                 $isTrial

@@ -49,7 +49,7 @@ class VideoController extends Controller
     {
         $request->validate([
             'videos'   => 'required|array|min:1',
-            'videos.*' => 'file|mimes:mkv,mp4',
+            'videos.*' => 'file|mimes:mkv,mp4|max:204800',
         ]);
 
         $user = auth()->user();

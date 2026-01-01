@@ -11,6 +11,8 @@
                 <form id="my-dropzone-form" action="{{ route('home.photo.store', $event->public_code) }}" method="POST"
                     enctype="multipart/form-data">
                     @csrf
+                    <input type="file" id="fileInput" accept="image/*" multiple hidden>
+
 
 
                     <div class="dropzone-container">
@@ -35,110 +37,134 @@
                     <div class="d-flex justify-content-end mt-3">
                         <button type="submit" id="submit-all" class="btn btn-primary px-4 py-2"
                             {{ $storagePercent >= 98 ? 'disabled' : '' }}>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round" class="me-2">
-                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
-                                <polyline points="17 21 17 13 7 13 7 21" />
-                                <polyline points="7 3 7 8 15 8" />
-                            </svg>
-                            Simpan Foto
+                            <span id="submit-text">
+                                Simpan Foto
+                            </span>
+                            <span id="submit-loading" class="d-none">
+                                <span class="spinner-border spinner-border-sm me-2"></span>
+                                Mengupload...
+                            </span>
                         </button>
+
                     </div>
                 </form>
             </div>
         </div>
 
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                <h5 class="m-0 fw-bold">Kelola Foto</h5>
+        <div class="card shadow-sm border-0 rounded-4">
 
+            <div class="card-header bg-white py-3 px-3 px-md-4 border-bottom-0">
+                <div class="row align-items-center g-3">
 
+                    <div class="col-12 col-md-auto me-md-auto">
+                        <div class="d-flex align-items-center gap-2">
+                            <h5 class="m-0 fw-bold text-dark">Galeri Foto</h5>
+                            <span
+                                class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3">
+                                {{ $photos->total() }} Foto
+                            </span>
+                        </div>
+                    </div>
 
-                <div class="d-flex align-items-center gap-2 ">
-                    <form method="POST" action="{{ route('home.photo.destroyAll', $event->public_code) }}"
-                        id="delete-all-form">
-                        @csrf
-                        @method('DELETE')
+                    <div class="col-12 col-md-auto">
+                        <div class="row g-2">
+                            <div class="col-7 col-md-auto">
+                                <form method="GET" id="sort-form">
+                                    <select name="sort" id="sort-select"
+                                        class="form-select form-select-sm bg-light border-0 fw-bold text-secondary"
+                                        style="height: 38px; min-width: 140px;">
+                                        <option value="latest" {{ $sort === 'latest' ? 'selected' : '' }}>Terbaru
+                                        </option>
+                                        <option value="oldest" {{ $sort === 'oldest' ? 'selected' : '' }}>Terlama
+                                        </option>
+                                        <option value="date" {{ $sort === 'date' ? 'selected' : '' }}>By Tanggal
+                                        </option>
+                                        <option value="time" {{ $sort === 'time' ? 'selected' : '' }}>By Waktu
+                                        </option>
+                                    </select>
+                                </form>
+                            </div>
 
-                        <button type="button" class="btn btn-sm btn-danger"
-                            {{ $photos->total() === 0 ? 'disabled' : '' }} onclick="deleteAllConfirm()">
-                            Hapus Semua
-                        </button>
-                    </form>
-                    <form method="GET" id="sort-form">
-                        <select name="sort" id="sort-select" class="form-select form-select-sm"
-                            style="width: 200px;">
-                            <option value="latest" {{ $sort === 'latest' ? 'selected' : '' }}>
-                                Terbaru
-                            </option>
-                            <option value="oldest" {{ $sort === 'oldest' ? 'selected' : '' }}>
-                                Terlama
-                            </option>
-                            <option value="date" {{ $sort === 'date' ? 'selected' : '' }}>
-                                Berdasarkan Tanggal
-                            </option>
-                            <option value="time" {{ $sort === 'time' ? 'selected' : '' }}>
-                                Berdasarkan Waktu
-                            </option>
-                        </select>
-                    </form>
+                            <div class="col-5 col-md-auto">
+                                <form method="POST" action="{{ route('home.photo.destroyAll', $event->public_code) }}"
+                                    id="delete-all-form">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="button"
+                                        class="btn btn-danger btn-sm w-100 d-flex align-items-center justify-content-center gap-2"
+                                        style="height: 38px;" {{ $photos->total() === 0 ? 'disabled' : '' }}
+                                        onclick="deleteAllConfirm()">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                            <path
+                                                d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                            </path>
+                                        </svg>
+                                        <span class="d-none d-md-inline">Hapus Semua</span>
+                                        <span class="d-md-none">Hapus</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
 
-                    <span class="badge bg-primary p-2 text-light border">
-                        {{ $photos->total() }} Foto
-                    </span>
                 </div>
             </div>
 
-
-
-            <div class="card-body bg-light">
-                <div class="row g-3">
+            <div class="card-body bg-light p-3 p-md-4">
+                <div class="row g-2 g-md-3">
                     @forelse ($photos as $photo)
-                        <div class="col-6 col-md-3 py-4">
-                            <div class="card h-100 shadow-sm border-0 overflow-hidden">
-                                <div style="height:180px;" class="position-relative bg-white">
-                                    <img src="{{ asset('storage/' . $photo->file_path) }}" loading="lazy"
-                                        decoding="async" width="300" height="180" class="w-100 h-100"
-                                        style="object-fit:cover; transition: transform 0.3s;"
-                                        onmouseover="this.style.transform='scale(1.05)'"
-                                        onmouseout="this.style.transform='scale(1)'">
+                        <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                            <div
+                                class="card h-100 border-0 shadow-sm photo-card position-relative overflow-hidden rounded-3">
+
+                                <div class="ratio ratio-1x1 bg-secondary-subtle">
+                                    <img src="{{ asset('storage/' . $photo->file_path) }}" loading="lazy" alt="Foto"
+                                        class="w-100 h-100 img-fixed">
                                 </div>
-                                <div class="card-footer bg-white p-2 border-top-0">
+
+                                <div class="card-overlay d-flex align-items-end justify-content-center p-2">
                                     <form action="{{ route('home.photo.destroy', [$event->public_code, $photo->id]) }}"
-                                        method="POST"class="delete-photo-form">
+                                        method="POST" class="w-100">
                                         @csrf
                                         @method('DELETE')
                                         <button type="button" onclick="deletePhotoConfirm(this)"
-                                            class="btn btn-sm btn-outline-danger w-100 d-flex align-items-center justify-content-center">
+                                            class="btn btn-light text-danger btn-sm w-100 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-1 delete-btn-hover">
                                             Hapus
                                         </button>
-
                                     </form>
                                 </div>
+
                             </div>
                         </div>
                     @empty
                         <div class="col-12 py-5 text-center">
-                            <p class="text-muted">Belum ada foto.</p>
+                            <div class="mb-3 opacity-50">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48"
+                                    viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="1.5"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2">
+                                    </rect>
+                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                    <polyline points="21 15 16 10 5 21"></polyline>
+                                </svg>
+                            </div>
+                            <p class="text-muted fw-medium small">Belum ada foto.</p>
                         </div>
                     @endforelse
-
                 </div>
-
             </div>
-            <div class="d-flex justify-content-between align-items-center mt-3 px-4">
-                <small class="text-muted py-3">
-                    Halaman {{ $photos->currentPage() }} dari {{ $photos->lastPage() }}
-                </small>
 
+            <div class="d-flex justify-content-between align-items-center mt-3 px-4 pb-3">
+                <small class="text-muted fw-bold" style="font-size: 0.8rem;">
+                    Hal {{ $photos->currentPage() }} / {{ $photos->lastPage() }}
+                </small>
                 <div class="pagination-wrapper">
                     {{ $photos->links('vendor.pagination.simple-window') }}
-
                 </div>
             </div>
-
-
         </div>
 
     </div>

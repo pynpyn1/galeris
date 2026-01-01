@@ -26,7 +26,7 @@
         <div class="flex flex-wrap justify-center gap-4 mb-16">
             <button
                 class="bg-white text-indigo-700 hover:bg-indigo-50 px-10 py-4 rounded-2xl font-bold text-lg transition shadow-xl">Buat
-                Ivent Anda</button>
+                Event Anda</button>
             <button
                 class="bg-transparent border-2 border-white/30 hover:border-white/60 text-white px-10 py-4 rounded-2xl font-bold text-lg transition">Lihat
                 Video Demo</button>
@@ -41,7 +41,7 @@
             </div>
             <div class="flex items-center gap-2">
                 <span class="w-2 h-2 bg-emerald-400 rounded-full"></span>
-                10,000+ Ivent
+                10,000+ Event
             </div>
             <div class="flex items-center gap-2">
                 <span class="w-2 h-2 bg-pink-400 rounded-full"></span>

@@ -19,7 +19,7 @@
                     {{-- Event Name --}}
                     <div class="mb-3">
                         <label class="form-label fw-semibold">
-                            Event Name
+                            Nama Acara
                         </label>
                         <input type="text" name="name" class="form-control"
                             placeholder="Wedding, Birthday Party, Baptism" required>
@@ -28,7 +28,7 @@
                     {{-- Event Date --}}
                     <div class="mb-3">
                         <label class="form-label fw-semibold">
-                            Event Start Date
+                            Tanggal Acara Dimulai
                         </label>
                         <input type="text" name="date_event" id="eventDatePicker" class="form-control"
                             placeholder="Select event date" required>

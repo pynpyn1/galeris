@@ -50,7 +50,7 @@
 
 <body class="bg-black overflow-hidden text-white">
 
-    <div id="setupModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div id="setupModal" class="fixed inset-0 z-50 flex items-start md:items-center justify-center p-4 overflow-y-auto">
         <div class="absolute inset-0 bg-black/90 backdrop-blur-md"></div>
 
         <div
@@ -244,35 +244,47 @@
     <div id="livewall" class="hidden">
         <div class="swiper w-screen h-screen">
             <div class="swiper-wrapper">
-                @php $buffer = null; @endphp
-                @foreach ($photos as $photo)
-                    @php $isPortrait = ($photo->height ?? 0) > ($photo->width ?? 0); @endphp
-                    @if ($isPortrait)
-                        @if ($buffer)
-                            <div class="swiper-slide flex items-center justify-center gap-6 px-10">
-                                <img src="{{ asset('storage/' . $buffer->file_path) }}"
-                                    class="w-1/2 h-full object-contain zoom">
-                                <img src="{{ asset('storage/' . $photo->file_path) }}"
-                                    class="w-1/2 h-full object-contain zoom">
-                            </div>
-                            @php $buffer = null; @endphp
+
+                @if ($photos->isNotEmpty())
+
+                    @php $buffer = null; @endphp
+                    @foreach ($photos as $photo)
+                        @php $isPortrait = ($photo->height ?? 0) > ($photo->width ?? 0); @endphp
+
+                        @if ($isPortrait)
+                            @if ($buffer)
+                                <div class="swiper-slide flex items-center justify-center gap-6 px-10">
+                                    <img src="{{ asset('storage/' . $buffer->file_path) }}"
+                                        class="w-1/2 h-full object-contain zoom">
+                                    <img src="{{ asset('storage/' . $photo->file_path) }}"
+                                        class="w-1/2 h-full object-contain zoom">
+                                </div>
+                                @php $buffer = null; @endphp
+                            @else
+                                @php $buffer = $photo; @endphp
+                            @endif
                         @else
-                            @php $buffer = $photo; @endphp
+                            <div class="swiper-slide flex items-center justify-center">
+                                <img src="{{ asset('storage/' . $photo->file_path) }}"
+                                    class="max-w-full max-h-full object-contain zoom">
+                            </div>
                         @endif
-                    @else
+                    @endforeach
+
+                    @if ($buffer)
                         <div class="swiper-slide flex items-center justify-center">
-                            <img src="{{ asset('storage/' . $photo->file_path) }}"
+                            <img src="{{ asset('storage/' . $buffer->file_path) }}"
                                 class="max-w-full max-h-full object-contain zoom">
                         </div>
                     @endif
-                @endforeach
-                @if ($buffer)
+                @else
                     <div class="swiper-slide flex items-center justify-center">
-                        <img src="{{ asset('storage/' . $buffer->file_path) }}"
-                            class="max-w-full max-h-full object-contain zoom">
+                        <img src="{{ $link->folder->thumbnail_url }}" class="zoom">
                     </div>
                 @endif
+
             </div>
+
         </div>
 
         <div id="qrBox" class="fixed z-40 bg-white p-3 rounded-xl shadow-xl">

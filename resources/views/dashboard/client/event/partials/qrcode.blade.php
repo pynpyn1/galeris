@@ -12,7 +12,7 @@
                                 <img src="{{ $qr_path }}" alt="QR Code Event" style="width: 160px; height: 160px;"
                                     class="mb-3 border rounded p-1">
 
-                                <a href="{{ $qr_path }}" download="QR-{{ $event->public_code }}.svg"
+                                <a href="{{ $qr_path }}" download="QR-{{ $event->public_code }}.png"
                                     class="btn btn-sm btn-outline-primary w-100">
                                     <i class="bi bi-download me-1"></i> Download QR Code
                                 </a>

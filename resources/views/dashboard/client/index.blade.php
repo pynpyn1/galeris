@@ -67,11 +67,36 @@
                     @include('dashboard.client.event.partials.subscribe.card.pending')
                 </div>
             </div>
-            <div class="row justify-content-center">
-                @foreach ($folders as $f)
-                    <div class="col-12 col-sm-10 col-md-10 mb-4">
 
-                        <div class="card d-md-flex flex-md-row rounded border overflow-hidden shadow-sm bg-white p-0">
+            @if ($folders->count() > 1)
+                <div class="row justify-content-center mb-4">
+                    <div class="col-12 col-sm-10 col-md-10">
+                        <div class="input-group shadow-sm" style="max-width: 350px;">
+                            <span class="input-group-text bg-white border-end-0 text-muted ps-3">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" id="folderSearchInput" class="form-control border-start-0 py-2"
+                                placeholder="Search event..." autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            <div id="noResultsFound" class="row justify-content-center d-none">
+                <div class="col-12 col-sm-10 col-md-10 text-center py-5">
+                    <div class="text-muted">
+                        <p>Tidak ditemukan acara yang sesuai dengan pencarian Anda.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="folderContainer" class="row justify-content-center">
+                @foreach ($folders as $index => $f)
+                    <div class="col-12 col-sm-10 col-md-10 mb-4 folder-item {{ $index === 0 ? '' : 'd-none' }}"
+                        data-name="{{ strtolower($f->name) }}">
+
+                        <div
+                            class="card d-md-flex flex-md-row rounded border overflow-hidden shadow-sm bg-white p-0 fade-in-animation">
 
                             <div class="d-none d-md-block flex-shrink-0"
                                 style="width: 35%; max-width: 280px; height: 100%;">
@@ -79,23 +104,18 @@
                                     class="w-100 h-100 object-cover rounded-start">
                             </div>
 
-
                             <div class="d-block d-md-none p-3 pb-0">
                                 <img src="{{ $f->thumbnail }}" alt="Thumbnail {{ $f->name }}" class="w-100 rounded"
                                     style="max-height: 200px; object-fit: cover;">
                             </div>
 
-
                             <div class="card-body d-flex flex-column justify-content-between p-4 flex-grow-1">
-
                                 <div>
-                                    <h5 class="font-weight-bold mb-1">{{ $f->name }}</h5>
-
+                                    <h5 class="font-weight-bold mb-1 folder-name">{{ $f->name }}</h5>
                                     <p class="text-sm text-muted mb-2">
                                         <i class="bi bi-calendar-event me-1"></i>
                                         {{ \Carbon\Carbon::parse($f->date)->format('d M Y') }}
                                     </p>
-
 
                                     @if ($f->is_trial)
                                         <span class=" bg-primary text-light rounded px-3 py-1"
@@ -124,7 +144,25 @@
                         </div>
                     </div>
                 @endforeach
+            </div>
 
+            <div class="row justify-content-center mb-4" id="paginationControls"
+                style="{{ $folders->count() <= 1 ? 'display:none;' : '' }}">
+                <div class="col-12 col-sm-10 col-md-10 d-flex justify-content-between align-items-center">
+                    <button type="button" class="btn btn-outline-primary d-flex justify-content-center align-items-center"
+                        id="prevFolderBtn" disabled>
+                        <i class="bi bi-chevron-left"></i> Previous
+                    </button>
+
+                    <span class="text-muted fw-bold" id="pageIndicator">
+                        1 / {{ $folders->count() }}
+                    </span>
+
+                    <button type="button" class="btn btn-outline-primary d-flex justify-content-center align-items-center"
+                        id="nextFolderBtn">
+                        Next <i class="bi bi-chevron-right"></i>
+                    </button>
+                </div>
             </div>
         @endif
     </div>
@@ -147,6 +185,22 @@
 @push('styles')
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <style>
+        .fade-in-animation {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         .flatpickr-months {
             background: #435ebf !important;
         }
@@ -270,6 +324,95 @@
                         saveBtn.disabled = false;
                     });
             });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('folderSearchInput');
+            const allItems = Array.from(document.querySelectorAll('.folder-item'));
+            const noResults = document.getElementById('noResultsFound');
+            const paginationControls = document.getElementById('paginationControls');
+            const prevBtn = document.getElementById('prevFolderBtn');
+            const nextBtn = document.getElementById('nextFolderBtn');
+            const pageIndicator = document.getElementById('pageIndicator');
+
+            let filteredItems = [...allItems];
+            let currentIndex = 0;
+
+            if (allItems.length === 0) return;
+
+
+            function updateDisplay() {
+                allItems.forEach(item => item.classList.add('d-none'));
+
+                if (filteredItems.length === 0) {
+                    noResults.classList.remove('d-none');
+                    paginationControls.style.display = 'none';
+                } else {
+                    noResults.classList.add('d-none');
+
+                    paginationControls.style.display = filteredItems.length > 1 ? '' : 'none';
+
+                    const currentItem = filteredItems[currentIndex];
+                    if (currentItem) {
+                        currentItem.classList.remove('d-none');
+
+                        const card = currentItem.querySelector('.card');
+                        if (card) {
+                            card.classList.remove('fade-in-animation');
+                            void card.offsetWidth;
+                            card.classList.add('fade-in-animation');
+                        }
+                    }
+
+                    if (paginationControls.style.display !== 'none') {
+                        prevBtn.disabled = currentIndex === 0;
+                        nextBtn.disabled = currentIndex === filteredItems.length - 1;
+                        if (pageIndicator) {
+                            pageIndicator.textContent = (currentIndex + 1) + ' / ' + filteredItems.length;
+                        }
+                    }
+                }
+            }
+
+            function filterFolders(query) {
+                const lowerQuery = query.toLowerCase();
+
+                filteredItems = allItems.filter(item => {
+                    const name = item.getAttribute('data-name');
+                    return name.includes(lowerQuery);
+                });
+
+                currentIndex = 0;
+                updateDisplay();
+            }
+
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    filterFolders(e.target.value);
+                });
+            }
+
+            if (prevBtn) {
+                prevBtn.addEventListener('click', function() {
+                    if (currentIndex > 0) {
+                        currentIndex--;
+                        updateDisplay();
+                    }
+                });
+            }
+
+            if (nextBtn) {
+                nextBtn.addEventListener('click', function() {
+                    if (currentIndex < filteredItems.length - 1) {
+                        currentIndex++;
+                        updateDisplay();
+                    }
+                });
+            }
+
+            updateDisplay();
         });
     </script>
 

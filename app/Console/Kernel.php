@@ -12,6 +12,10 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
+        $schedule->call(function () {
+            \File::cleanDirectory(storage_path('app/public/temp'));
+        })->daily();
+
         $schedule->command('gallery:send-reminder')->dailyAt('00.00');
         $schedule->command('folder:delete-expired-trial')->dailyAt('00.00');
         $schedule->command('purchase:expire-pending-purchases')->dailyAt('00.00');

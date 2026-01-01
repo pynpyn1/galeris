@@ -12,7 +12,8 @@
 
             <div class="flex flex-wrap gap-4">
                 <button
-                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-2xl font-bold text-lg transition shadow-lg shadow-indigo-200">Buat Ivent</button>
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-2xl font-bold text-lg transition shadow-lg shadow-indigo-200">Buat
+                    Event</button>
                 <button
                     class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 px-8 py-4 rounded-2xl font-bold text-lg transition shadow-sm">Lihat
                     Demo</button>
@@ -43,7 +44,7 @@
                 </div>
                 <div>
                     <div class="text-xl font-bold text-slate-900">900+</div>
-                    <div class="text-xs text-slate-500 font-medium">Ivent Terbuat</div>
+                    <div class="text-xs text-slate-500 font-medium">Event Terbuat</div>
                 </div>
             </div>
         </div>

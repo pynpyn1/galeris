@@ -24,7 +24,7 @@
                 </button>
 
                 @if (isset($link) && $link && $link->generate_qr_code)
-                    <a href="{{ $qr_path }}" download="QR-{{ $folder->public_code ?? 'event' }}.svg"
+                    <a href="{{ $qr_path }}" download="QR-{{ $link->folder->public_code ?? 'event' }}.png"
                         class="btn btn-primary py-2">
                         Unduh kode QR
                     </a>

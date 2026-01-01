@@ -215,7 +215,7 @@
         </div>
 
         @if (Auth::check() && Auth::user()->hasPermissionTo('dashboard_client'))
-            <div class="sidebar-footer p-3 mt-auto mb-4">
+            <div class="sidebar-footer p-3 mt-auto mb-10">
                 <a href="{{ $hasActivePackage ? 'javascript:void(0)' : route('home.subscribe') }}"
                     class="btn btn-primary border h-50 w-100 d-flex justify-content-center align-items-center mb-3"
                     @if ($hasActivePackage) data-bs-toggle="modal" data-bs-target="#createEventModal" @endif>

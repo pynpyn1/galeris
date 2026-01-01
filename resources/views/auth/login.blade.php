@@ -149,10 +149,10 @@
                                 <i class="bi bi-google"></i> Google
                             </a>
 
-                            <a href="{{ route('social.login', ['provider' => 'facebook']) }}"
+                            {{-- <a href="{{ route('social.login', ['provider' => 'facebook']) }}"
                                 class="mt-2 btn w-100 btn-outline-primary btn-login">
                                 <i class="bi bi-facebook"></i> Facebook
-                            </a>
+                            </a> --}}
 
 
 

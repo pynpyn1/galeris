@@ -186,16 +186,9 @@ class PurchaseController extends Controller
 
 
     // Midtrans
-    public function snapCheckout(PurchaseModel $purchase)
+    public function snapCheckout(Request $request, PurchaseModel $purchase)
     {
-        if ($purchase->snap_token && $purchase->snap_status === 'pending' && $purchase->snap_amount == $purchase->final_price) {
-            return response()->json([
-                'snapToken' => $purchase->snap_token
-            ]);
-        }
-
-
-        if ($purchase->snap_status === 'success') {
+        if ($purchase->snap_status === 'success' || $purchase->payment_status === 'paid') {
             return response()->json([
                 'error' => true,
                 'message' => 'Transaksi sudah dibayar'
@@ -207,26 +200,54 @@ class PurchaseController extends Controller
         \Midtrans\Config::$isSanitized = true;
         \Midtrans\Config::$is3ds = true;
 
+        $requestedType = $request->query('payment_type');
+        $enabledPayments = [];
+
+        if ($requestedType) {
+            $map = [
+                'gopay'      => ['gopay', 'qris'],
+                'echannel'   => ['echannel'],
+                'bni_va'     => ['bni_va'],
+                'bri_va'     => ['bri_va'],
+                'permata_va' => ['permata_va'],
+                'cimb_va'    => ['cimb_va'],
+            ];
+
+            if (isset($map[$requestedType])) {
+                $enabledPayments = $map[$requestedType];
+            }
+        }
+
+        $uniqueOrderId = $purchase->invoice_number . '-' . time();
+
         $params = [
             'transaction_details' => [
-                'order_id' => $purchase->invoice_number,
-                'gross_amount' => $purchase->final_price,
+                'order_id'     => $uniqueOrderId,
+                'gross_amount' => (int) $purchase->final_price,
             ],
             'customer_details' => [
                 'first_name' => auth()->user()->name,
-                'email' => auth()->user()->email,
+                'email'      => auth()->user()->email,
             ],
-            'callbacks' => [
-            'finish' => url('/payment/finish'),
+            'enabled_payments' => $enabledPayments,
+
+            'expiry' => [
+                'start_time' => date("Y-m-d H:i:s O"),
+                'unit'       => 'minutes',
+                'duration'   => 15
             ],
         ];
+
+        if (empty($enabledPayments)) {
+            unset($params['enabled_payments']);
+        }
 
         try {
             $snapToken = \Midtrans\Snap::getSnapToken($params);
 
             $purchase->update([
-                'snap_token' => $snapToken,
-                'snap_status' => 'pending',
+                'snap_token'     => $snapToken,
+                'snap_status'    => 'pending',
                 'snap_amount'    => $purchase->final_price,
                 'payment_method' => 'midtrans',
             ]);
@@ -234,6 +255,7 @@ class PurchaseController extends Controller
             return response()->json([
                 'snapToken' => $snapToken
             ]);
+
         } catch (\Exception $e) {
             \Log::error('Midtrans Snap Error', [
                 'invoice' => $purchase->invoice_number,
@@ -242,19 +264,12 @@ class PurchaseController extends Controller
 
             return response()->json([
                 'error' => true,
-                'message' => 'Gagal memproses pembayaran'
+                'message' => 'Gagal memproses pembayaran: ' . $e->getMessage()
             ], 500);
         }
     }
 
-
-
-
-
-
-
-
-   public function webhook(Request $request)
+    public function webhook(Request $request)
     {
         $serverKey = config('services.midtrans.server_key');
 
@@ -269,45 +284,35 @@ class PurchaseController extends Controller
             abort(403, 'Invalid signature');
         }
 
-        $purchase = PurchaseModel::where('invoice_number', $request->order_id)->first();
+        $realInvoiceNumber = Str::beforeLast($request->order_id, '-');
+
+        $purchase = PurchaseModel::where('invoice_number', $realInvoiceNumber)->first();
+
+        if (!$purchase) {
+            $purchase = PurchaseModel::where('invoice_number', $request->order_id)->first();
+        }
 
         if (! $purchase) {
             return response()->json(['message' => 'Order not found'], 404);
         }
 
         $status = $request->transaction_status;
+        $fraud  = $request->fraud_status;
 
-
-        if ($status === 'settlement') {
-
-            if ($purchase->payment_status === 'paid') {
-                return response()->json(['message' => 'Already processed']);
+        if ($status == 'capture') {
+            if ($fraud == 'challenge') {
+                $purchase->update(['snap_status' => 'challenge']);
+            } else {
+                $this->setSuccess($purchase);
             }
-
-            $start = now();
-            $end   = now()->addMonth();
-
-            $purchase->update([
-                'payment_status'        => 'paid',
-                'snap_status'           => 'success',
-                'subscription_start'    => $start,
-                'subscription_end'      => $end,
-                'next_payment_due_at'   => $end,
-                'subscription_status'   => 'active',
-                'auto_renew'            => true,
-            ]);
-
-            return response()->json(['message' => 'Payment success']);
         }
-
-
-        if ($status === 'pending') {
-            $purchase->update([
-                'snap_status' => 'pending'
-            ]);
+        else if ($status == 'settlement') {
+            $this->setSuccess($purchase);
         }
-
-        if (in_array($status, ['expire', 'cancel'])) {
+        else if ($status == 'pending') {
+            $purchase->update(['snap_status' => 'pending']);
+        }
+        else if ($status == 'deny' || $status == 'expire' || $status == 'cancel') {
             $purchase->update([
                 'snap_status' => 'expired',
                 'subscription_status' => 'nonactive'
@@ -315,6 +320,26 @@ class PurchaseController extends Controller
         }
 
         return response()->json(['ok' => true]);
+    }
+
+    private function setSuccess($purchase)
+    {
+        if ($purchase->payment_status === 'paid') {
+            return;
+        }
+
+        $start = now();
+        $end   = now()->addMonth();
+
+        $purchase->update([
+            'payment_status'        => 'paid',
+            'snap_status'           => 'success',
+            'subscription_start'    => $start,
+            'subscription_end'      => $end,
+            'next_payment_due_at'   => $end,
+            'subscription_status'   => 'active',
+            'auto_renew'            => false,
+        ]);
     }
 
 

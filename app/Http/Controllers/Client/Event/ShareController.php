@@ -18,6 +18,7 @@ use App\Imports\EventGuestImport;
 use App\Models\PurchaseModel;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
+use Imagick;
 
 
 class ShareController extends Controller
@@ -46,21 +47,45 @@ class ShareController extends Controller
             'isPro' => $isPro
         ]);
     }
-
     public function generateqr(FolderModel $folder, Request $request)
     {
         $link = $folder->link()->first();
+        $svgFile = $request->file('qr_svg');
 
-        $svg = $request->file('qr_svg');
-
-        $filename = 'qr_' . $link->id . '_' . time() . '.svg';
-        $path = public_path('qr/' . $filename);
-
-        if (!file_exists(public_path('qr'))) {
-            mkdir(public_path('qr'), 0755, true);
+        if (!$svgFile) {
+            return response()->json([
+                'success' => false,
+                'message' => 'File SVG tidak ditemukan'
+            ], 422);
         }
 
-        file_put_contents($path, file_get_contents($svg));
+        $qrDir = public_path('qr');
+        if (!file_exists($qrDir)) {
+            mkdir($qrDir, 0755, true);
+        }
+
+        $filename = 'qr_' . $link->id . '_' . time() . '.png';
+        $pngPath = $qrDir . '/' . $filename;
+
+        $tempSvg = storage_path('app/temp_qr.svg');
+        file_put_contents($tempSvg, file_get_contents($svgFile));
+
+        $cmd = sprintf(
+            'rsvg-convert -w 500 -h 500 %s -o %s',
+            escapeshellarg($tempSvg),
+            escapeshellarg($pngPath)
+        );
+
+        exec($cmd, $output, $status);
+
+        unlink($tempSvg);
+
+        if ($status !== 0 || !file_exists($pngPath) || filesize($pngPath) < 1000) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal convert SVG ke PNG'
+            ], 500);
+        }
 
         $link->update([
             'generate_qr_code' => $filename
@@ -69,9 +94,12 @@ class ShareController extends Controller
         return response()->json([
             'success' => true,
             'qr_url' => asset('qr/' . $filename),
-            'message' => 'Berhasil mengupdate qr'
+            'message' => 'QR berhasil disimpan sebagai PNG'
         ]);
     }
+
+
+
 
 
     public function remind(FolderModel $folder, Request $request)

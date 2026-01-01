@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\FolderModel;
 use App\Models\LinkModel;
 use App\Models\PackageModel;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use ZipArchive;
@@ -76,17 +77,44 @@ class EventController extends Controller
 
     public function update(Request $request, FolderModel $folder)
     {
-        $validate = $request->validate([
-            'name' => 'required|string',
-        ],[
-            'name.required' => 'Tolong inputkan nama untuk event anda!!!'
+
+        if ($folder->is_trial) {
+
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+            ], [
+                'name.required' => 'Tolong inputkan nama untuk event anda!',
+            ]);
+
+            $folder->update([
+                'name' => $validated['name'],
+            ]);
+
+            return redirect()->back()
+                ->with('success', 'Nama acara berhasil diperbarui');
+        }
+
+        $validated = $request->validate([
+            'name'       => 'required|string|max:255',
+            'date_event' => 'required|date|after_or_equal:today',
+        ], [
+            'name.required'       => 'Tolong inputkan nama untuk event anda!',
+            'date_event.required' => 'Tanggal acara wajib diisi',
         ]);
 
-        $folder->update($validate);
+        $startDate = Carbon::parse($validated['date_event']);
 
-        return redirect()->back()->with('success', 'Berhasil mengubah nama acara');
+        $endDate = $startDate->copy()->addWeeks(1);
+
+        $folder->update([
+            'name'           => $validated['name'],
+            'date_event'     => $startDate,
+            'date_event_end' => $endDate,
+        ]);
+
+        return redirect()->back()
+            ->with('success', 'Event berhasil diperbarui');
     }
-
 
     public function thumbnail(Request $request, $id)
     {

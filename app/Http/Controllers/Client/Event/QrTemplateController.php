@@ -23,7 +23,7 @@ class QrTemplateController extends Controller
             ->active()
             ->first();
 
-        $plan = $purchase?->package?->plan; // beginner | basic | pro | premium
+        $plan = $purchase?->package?->plan;
         $isPremium = in_array($plan, ['pro', 'premium']);
 
         $activeTemplate = $request->query('template');
@@ -33,14 +33,12 @@ class QrTemplateController extends Controller
                 $q->whereNull('deleted_at');
             }]);
 
-        // 🔒 FILTER BERDASARKAN PAKET
         if (!$isPremium) {
             $templatesQuery->where('name_template', 'Standar');
         }
 
         $templates = $templatesQuery->get();
 
-        // filter via tab klik
         if ($activeTemplate) {
             $templates = $templates->where('name_template', $activeTemplate);
         }

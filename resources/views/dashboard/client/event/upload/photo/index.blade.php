@@ -50,7 +50,6 @@
             background: #435ebf;
             color: #ffffff;
             box-shadow: 0 4px 12px rgba(67, 94, 191, 0.35);
-            /* Glow effect */
             transform: scale(1.05);
         }
 
@@ -69,101 +68,169 @@
             }
         }
 
-
         .gallery-thumb {
             object-fit: cover;
-            image-rendering: -webkit-optimize-contrast;
-            filter: saturate(0.95) contrast(0.95);
-            transition: transform 0.3s ease, filter 0.3s ease;
-            will-change: transform;
+            transition: transform 0.3s ease;
         }
 
         .gallery-thumb:hover {
             transform: scale(1.05);
-            filter: none;
-        }
-
-        .select2-container--default .select2-selection--single {
-            height: 38px;
-            padding: 5px 10px;
-            border-radius: 6px;
-            border: 1px solid #ced4da;
-        }
-
-        .select2-selection__rendered {
-            line-height: 26px !important;
-        }
-
-        .select2-selection__arrow {
-            height: 36px !important;
         }
 
         .modern-dropzone {
             border: 2px dashed #cbd5e1;
-            border-radius: 10px;
+            border-radius: 12px;
             background: #f8fafc;
-            min-height: 220px;
-            padding: 20px;
+            min-height: 200px;
+            padding: 10px;
             display: flex;
             flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
-            align-content: center;
-            gap: 15px;
-
+            justify-content: flex-start;
+            align-items: flex-start;
+            gap: 10px;
             transition: all 0.3s ease;
-            position: relative;
         }
 
         .modern-dropzone:hover {
-            border-color: #3b82f6;
+            border-color: #435ebf;
             background: #eff6ff;
         }
 
         .modern-dropzone .dz-message {
             width: 100%;
-            text-align: center;
             margin: 2em 0;
+            order: -1;
         }
 
-        /* Styling Preview Dropzone */
+        .modern-dropzone.dz-started .dz-message {
+            display: none;
+        }
+
         .dropzone .dz-preview {
             background: transparent;
+            position: relative;
+            z-index: 10;
             margin: 0 !important;
+            width: calc(50% - 5px);
+            flex: 0 0 calc(50% - 5px);
+            min-height: auto;
         }
 
         .dropzone .dz-preview .dz-image {
-            width: 120px;
-            height: 120px;
-            border-radius: 8px;
+            width: 100% !important;
+            height: 0 !important;
+            padding-bottom: 100%;
+            border-radius: 12px;
             overflow: hidden;
+            position: relative;
         }
 
         .dropzone .dz-preview .dz-image img {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .dropzone .dz-preview .dz-remove {
-            margin-top: 8px;
-            color: #dc3545;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.85rem;
+        .dropzone .dz-preview .dz-progress {
+            background: rgba(0, 0, 0, 0.5);
+            height: 8px;
+            border-radius: 10px;
+            position: absolute;
+            top: auto !important;
+            bottom: 15px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            margin-left: 0 !important;
+            width: 80%;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        .dropzone .dz-preview.is-uploading .dz-progress {
+            opacity: 1;
+        }
+
+        .dropzone .dz-preview .dz-progress .dz-upload {
+            background: #22c55e;
+            background: linear-gradient(to right, #22c55e, #4ade80);
             display: block;
-            text-align: center;
+            height: 100%;
+            width: 0%;
+            border-radius: 10px;
+            transition: width 0.3s linear;
+        }
+
+        .dropzone .dz-preview .dz-remove {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            z-index: 30;
+            color: #ef4444;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 5%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
             cursor: pointer;
-            border: 1px solid #dc3545;
-            border-radius: 4px;
-            padding: 2px 5px;
-            background: white;
+            border: none;
+            transition: all 0.2s;
+            margin: 0;
+            padding: 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .dropzone .dz-preview .dz-remove:hover {
-            background: #dc3545;
+            background: #ef4444;
             color: white;
-            text-decoration: none;
+            transform: scale(1.1);
+        }
+
+        .dropzone .dz-preview .dz-success-mark,
+        .dropzone .dz-preview .dz-error-mark {
+            display: none;
+        }
+
+        @keyframes uploadPulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+                transform: scale(1);
+            }
+
+            50% {
+                box-shadow: 0 0 0 5px rgba(34, 197, 94, 0);
+                transform: scale(0.98);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+                transform: scale(1);
+            }
+        }
+
+        .dz-preview.upload-active .dz-image {
+            animation: uploadPulse 1.5s infinite;
+            border: 2px solid #22c55e;
+            opacity: 0.8;
+        }
+
+        @media (min-width: 768px) {
+            .dropzone .dz-preview {
+                width: 140px;
+                flex: 0 0 auto;
+            }
+
+            .dropzone .dz-preview .dz-image {
+                height: 140px !important;
+                padding-bottom: 0;
+            }
         }
     </style>
 @endpush
@@ -201,46 +268,127 @@
 
         document.addEventListener("DOMContentLoaded", function() {
 
+            const MAX_MB = 50;
+            const form = document.getElementById('my-dropzone-form');
+            const submitBtn = document.getElementById('submit-all');
+            const submitText = document.getElementById('submit-text');
+            const submitLoading = document.getElementById('submit-loading');
+
             const myDropzone = new Dropzone("#myDropzone", {
                 url: "#",
                 autoProcessQueue: false,
                 uploadMultiple: true,
-                addRemoveLinks: true,
                 parallelUploads: 50,
                 maxFiles: 50,
-                acceptedFiles: ".jpeg,.jpg,.png,.webp",
-                dictRemoveFile: "Batal",
+                acceptedFiles: "image/*",
+                addRemoveLinks: true,
+                dictRemoveFile: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`,
+                clickable: true,
+                thumbnailWidth: 300,
+                thumbnailHeight: 300,
             });
 
-            const form = document.getElementById('my-dropzone-form');
+            myDropzone.on("addedfile", function(file) {
+                if (file.size > MAX_MB * 1024 * 1024) {
+                    showToast(`Ukuran foto maksimal ${MAX_MB}MB`, 'error');
+                    myDropzone.removeFile(file);
+                }
+            });
 
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
 
-                if (myDropzone.getAcceptedFiles().length === 0) {
-                    alert("Silakan pilih minimal satu foto!");
+                const files = myDropzone.getAcceptedFiles();
+
+                if (files.length === 0) {
+                    showToast("Silakan pilih minimal satu foto!", "warning");
                     return;
                 }
 
-                const files = myDropzone.getAcceptedFiles();
+                submitBtn.disabled = true;
+                submitText.classList.add('d-none');
+                submitLoading.classList.remove('d-none');
 
-                const dataTransfer = new DataTransfer();
-
-                files.forEach(file => {
-                    dataTransfer.items.add(file);
+                const previews = document.querySelectorAll('.dz-preview');
+                previews.forEach(el => {
+                    el.classList.add('upload-active');
+                    el.classList.add('is-uploading');
                 });
 
-                const fileInput = document.createElement("input");
-                fileInput.type = "file";
-                fileInput.name = "photos[]";
-                fileInput.multiple = true;
-                fileInput.style.display = "none";
-                fileInput.files = dataTransfer.files;
-                form.appendChild(fileInput);
-                form.submit();
+                const formData = new FormData(form);
+                files.forEach(file => {
+                    formData.append('photos[]', file);
+                });
+
+                const xhr = new XMLHttpRequest();
+                xhr.open("POST", form.action, true);
+                xhr.setRequestHeader('X-CSRF-TOKEN', document.querySelector('input[name="_token"]').value);
+
+                xhr.upload.onprogress = function(e) {
+                    if (e.lengthComputable) {
+                        const percent = Math.round((e.loaded / e.total) * 100);
+
+                        const progressBars = document.querySelectorAll('.dz-upload');
+                        progressBars.forEach(bar => {
+                            bar.style.width = percent + "%";
+                        });
+                    }
+                };
+
+                xhr.onload = function() {
+                    previews.forEach(el => {
+                        el.classList.remove('upload-active');
+                        el.classList.remove('is-uploading');
+                    });
+
+                    if (xhr.status === 200) {
+                        showToast('Upload berhasil!', 'success');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 800);
+                    } else if (xhr.status === 413) {
+                        showToast('Ukuran file terlalu besar!', 'error');
+                        resetButton();
+                    } else {
+                        showToast('Upload gagal!', 'error');
+                        resetButton();
+                    }
+                };
+
+                xhr.onerror = function() {
+                    showToast('Terjadi kesalahan jaringan!', 'error');
+                    resetButton();
+                    previews.forEach(el => el.classList.remove('upload-active'));
+                };
+
+                xhr.send(formData);
+            });
+
+            function resetButton() {
+                submitBtn.disabled = false;
+                submitText.classList.remove('d-none');
+                submitLoading.classList.add('d-none');
+            }
+
+        });
+        document.addEventListener("DOMContentLoaded", function() {
+            const dropzoneEl = document.getElementById('myDropzone');
+            const fileInput = document.getElementById('fileInput');
+
+            dropzoneEl.addEventListener('click', function() {
+                fileInput.click();
+            });
+
+            fileInput.addEventListener('change', function(e) {
+                const files = e.target.files;
+                for (let i = 0; i < files.length; i++) {
+                    myDropzone.addFile(files[i]);
+                }
+                e.target.value = '';
             });
         });
     </script>
+
     <script>
         function deleteAllConfirm() {
             Swal.fire({

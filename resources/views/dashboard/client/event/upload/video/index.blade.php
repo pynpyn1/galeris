@@ -3,221 +3,9 @@
 @section('title', 'Kelola Video')
 
 @section('content')
-    @if ($storagePercent >= 97)
-        <div class="row justify-content-center mb-4">
-            <div class="col-md-8">
-                <div class="card border-danger shadow-sm">
-                    <div class="card-body d-flex align-items-center gap-3">
-                        <div class="flex-grow-1">
-                            <h6 class="mb-1 fw-bold text-danger">
-                                Penyimpanan Penuh
-                            </h6>
-                            <small class="text-muted">
-                                Kapasitas penyimpanan Anda telah habis
-                                ({{ round($usedStorage / 1024 / 1024, 2) }} MB /
-                                {{ round($storageLimit / 1024 / 1024, 0) }} MB).
-                            </small>
+    @include('dashboard.client.event.upload.video.partials.storage_warning')
 
-                            <div class="progress mt-2" style="height: 8px;">
-                                <div class="progress-bar bg-danger progress-bar-striped progress-bar-animated"
-                                    role="progressbar" style="width: 100%">
-                                </div>
-                            </div>
-
-                            <div class="mt-3">
-                                <small class="text-danger fw-semibold">
-                                    Hapus beberapa video untuk dapat mengunggah video baru.
-                                </small>
-                            </div>
-                        </div>
-
-
-                    </div>
-                </div>
-            </div>
-        </div>
-    @elseif ($storagePercent >= 80)
-        <div class="row justify-content-center mb-4">
-            <div class="col-md-8">
-                <div class="card border-warning shadow-sm">
-                    <div class="card-body d-flex align-items-center gap-3">
-                        <div class="flex-grow-1">
-                            <h6 class="mb-1 fw-bold">
-                                Penyimpanan Hampir Penuh
-                            </h6>
-                            <small class="text-muted">
-                                Anda telah menggunakan
-                                <strong>{{ $storagePercent }}%</strong>
-                                dari total kapasitas
-                                ({{ round($usedStorage / 1024 / 1024, 2) }} MB /
-                                {{ round($storageLimit / 1024 / 1024, 0) }} MB).
-                            </small>
-
-                            <div class="progress mt-2" style="height: 8px;">
-                                <div class="progress-bar rounded-pill progress-bar-striped progress-bar-animated bg-warning"
-                                    role="progressbar" style="width: {{ $storagePercent }}%">
-                                </div>
-                            </div>
-                            <div class="d-block">
-                                <p>Segera tingkatkan langganan anda untuk mendapatkan extra storage dan fitur lainnya!</p>
-                                <a href="{{ route('home.subscribe') }}" class="btn btn-outline-primary ">Tingkatkan
-                                    Langganan</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    @endif
-
-
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-
-            <div class="card shadow-sm mb-4 border-0">
-                <div class="card-header bg-white py-3 border-bottom-0">
-                    <h5 class="m-0 fw-bold">
-                        Upload Video Baru
-                    </h5>
-                </div>
-
-                <div class="card-body">
-                    <form id="my-dropzone-form" action="{{ route('home.video.store', $event->public_code) }}" method="POST"
-                        enctype="multipart/form-data">
-                        @csrf
-
-                        <div class="dropzone-container">
-                            <div class="dropzone modern-dropzone" id="myDropzone">
-                                <div class="dz-message needsclick">
-                                    <div class="mb-3">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"
-                                            viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5"
-                                            stroke-linecap="round" stroke-linejoin="round">
-                                            <path
-                                                d="M17.5 19c0-1.7-1.3-3-3-3h-1.1c-.1-2.6-2.2-4.6-4.8-4.5-2.2 0-4.1 1.6-4.5 3.7C2 15.6 2 18.6 4.5 19h13z" />
-                                            <polyline points="9 11 12 8 15 11" />
-                                            <line x1="12" y1="8" x2="12" y2="16" />
-                                        </svg>
-                                    </div>
-                                    <h5 class="text-dark fw-bold">Klik atau Drop Video Disini</h5>
-                                    <span class="text-muted small">Maksimal 1GiB per file (MKV, MP4)</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="d-flex justify-content-end mt-3">
-                            <button type="submit" id="submit-all" class="btn btn-primary px-4 py-2"
-                                {{ $storagePercent >= 98 ? 'disabled' : '' }}>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" class="me-2">
-                                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
-                                    <polyline points="17 21 17 13 7 13 7 21" />
-                                    <polyline points="7 3 7 8 15 8" />
-                                </svg>
-                                Simpan Video
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="m-0 fw-bold">Kelola Video</h5>
-
-
-
-                    <div class="d-flex align-items-center gap-2 ">
-                        <form method="POST" action="{{ route('home.video.destroyAll', $event->public_code) }}"
-                            id="delete-all-form">
-                            @csrf
-                            @method('DELETE')
-
-                            <button type="button" class="btn btn-sm btn-danger"
-                                {{ $videos->total() === 0 ? 'disabled' : '' }} onclick="deleteAllConfirm()">
-                                Hapus Semua
-                            </button>
-                        </form>
-                        <form method="GET" id="sort-form">
-                            <select name="sort" id="sort-select" class="form-select form-select-sm"
-                                style="width: 200px;">
-                                <option value="latest" {{ $sort === 'latest' ? 'selected' : '' }}>
-                                    Terbaru
-                                </option>
-                                <option value="oldest" {{ $sort === 'oldest' ? 'selected' : '' }}>
-                                    Terlama
-                                </option>
-                                <option value="date" {{ $sort === 'date' ? 'selected' : '' }}>
-                                    Berdasarkan Tanggal
-                                </option>
-                                <option value="time" {{ $sort === 'time' ? 'selected' : '' }}>
-                                    Berdasarkan Waktu
-                                </option>
-                            </select>
-                        </form>
-
-                        <span class="badge bg-primary p-2 text-light border">
-                            {{ $videos->total() }} Video
-                        </span>
-                    </div>
-                </div>
-
-
-
-                <div class="card-body bg-light">
-                    <div class="row g-3">
-                        @forelse ($videos as $video)
-                            <div class="col-6 col-md-3 py-4">
-                                <div class="card h-100 shadow-sm border-0 overflow-hidden">
-                                    <div style="height:180px;" class="position-relative bg-white">
-                                        <video class="w-100 h-100" style="object-fit: cover;" controls
-                                            preload="metadata">
-                                            <source src="{{ asset('storage/' . $video->file_path) }}"
-                                                type="{{ $video->mime_type }}">
-                                            Browser Anda tidak mendukung video.
-                                        </video>
-                                    </div>
-                                    <div class="card-footer bg-white p-2 border-top-0">
-                                        <form
-                                            action="{{ route('home.video.destroy', [$event->public_code, $video->id]) }}"
-                                            method="POST"class="delete-video-form">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="button" onclick="deletevideoConfirm(this)"
-                                                class="btn btn-sm btn-outline-danger w-100 d-flex align-items-center justify-content-center">
-                                                Hapus
-                                            </button>
-
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        @empty
-                            <div class="col-12 py-5 text-center">
-                                <p class="text-muted">Belum ada video.</p>
-                            </div>
-                        @endforelse
-
-                    </div>
-
-                </div>
-                <div class="d-flex justify-content-between align-items-center mt-3 px-4">
-                    <small class="text-muted py-3">
-                        Halaman {{ $videos->currentPage() }} dari {{ $videos->lastPage() }}
-                    </small>
-
-                    <div class="pagination-wrapper">
-                        {{ $videos->links('vendor.pagination.simple-window') }}
-
-                    </div>
-                </div>
-
-
-            </div>
-
-        </div>
-    </div>
+    @include('dashboard.client.event.upload.video.partials.video')
 
 @endsection
 
@@ -305,70 +93,158 @@
 
         .modern-dropzone {
             border: 2px dashed #cbd5e1;
-            border-radius: 10px;
+            border-radius: 12px;
             background: #f8fafc;
-            min-height: 220px;
-            padding: 20px;
+            min-height: 200px;
+            padding: 10px;
             display: flex;
             flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
-            align-content: center;
-            gap: 15px;
-
+            justify-content: flex-start;
+            align-items: flex-start;
+            gap: 10px;
             transition: all 0.3s ease;
-            position: relative;
         }
 
         .modern-dropzone:hover {
-            border-color: #3b82f6;
+            border-color: #435ebf;
             background: #eff6ff;
         }
 
         .modern-dropzone .dz-message {
             width: 100%;
-            text-align: center;
             margin: 2em 0;
+            order: -1;
         }
 
-        /* Styling Preview Dropzone */
+        .modern-dropzone.dz-started .dz-message {
+            display: none;
+        }
+
         .dropzone .dz-preview {
             background: transparent;
+            position: relative;
+            z-index: 10;
             margin: 0 !important;
+            width: calc(50% - 5px);
+            flex: 0 0 calc(50% - 5px);
+            min-height: auto;
         }
 
         .dropzone .dz-preview .dz-image {
-            width: 120px;
-            height: 120px;
-            border-radius: 8px;
+            width: 100% !important;
+            height: 0 !important;
+            padding-bottom: 100%;
+            border-radius: 12px;
             overflow: hidden;
+            position: relative;
         }
 
         .dropzone .dz-preview .dz-image img {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .dropzone .dz-preview .dz-remove {
-            margin-top: 8px;
-            color: #dc3545;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.85rem;
+        .dropzone .dz-preview .dz-progress {
+            background: rgba(0, 0, 0, 0.5);
+            height: 8px;
+            border-radius: 10px;
+            position: absolute;
+            top: auto !important;
+            bottom: 15px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            margin-left: 0 !important;
+            width: 80%;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        .dropzone .dz-preview.is-uploading .dz-progress {
+            opacity: 1;
+        }
+
+        .dropzone .dz-preview .dz-progress .dz-upload {
+            background: #22c55e;
+            background: linear-gradient(to right, #22c55e, #4ade80);
             display: block;
-            text-align: center;
+            height: 100%;
+            width: 0%;
+            border-radius: 10px;
+            transition: width 0.3s linear;
+        }
+
+        .dropzone .dz-preview .dz-remove {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            z-index: 30;
+            color: #ef4444;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 5%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
             cursor: pointer;
-            border: 1px solid #dc3545;
-            border-radius: 4px;
-            padding: 2px 5px;
-            background: white;
+            border: none;
+            transition: all 0.2s;
+            margin: 0;
+            padding: 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .dropzone .dz-preview .dz-remove:hover {
-            background: #dc3545;
+            background: #ef4444;
             color: white;
-            text-decoration: none;
+            transform: scale(1.1);
+        }
+
+        .dropzone .dz-preview .dz-success-mark,
+        .dropzone .dz-preview .dz-error-mark {
+            display: none;
+        }
+
+        @keyframes uploadPulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+                transform: scale(1);
+            }
+
+            50% {
+                box-shadow: 0 0 0 5px rgba(34, 197, 94, 0);
+                transform: scale(0.98);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+                transform: scale(1);
+            }
+        }
+
+        .dz-preview.upload-active .dz-image {
+            animation: uploadPulse 1.5s infinite;
+            border: 2px solid #22c55e;
+            opacity: 0.8;
+        }
+
+        @media (min-width: 768px) {
+            .dropzone .dz-preview {
+                width: 140px;
+                flex: 0 0 auto;
+            }
+
+            .dropzone .dz-preview .dz-image {
+                height: 140px !important;
+                padding-bottom: 0;
+            }
         }
     </style>
 @endpush
@@ -406,53 +282,106 @@
 
         document.addEventListener("DOMContentLoaded", function() {
 
+            const MAX_MB = 1024;
+            const form = document.getElementById('my-dropzone-form');
+            const submitBtn = document.getElementById('submit-all');
+            const submitText = document.getElementById('submit-text');
+            const submitLoading = document.getElementById('submit-loading');
+
             const myDropzone = new Dropzone("#myDropzone", {
                 url: "#",
                 autoProcessQueue: false,
                 uploadMultiple: true,
-                addRemoveLinks: true,
-                parallelUploads: 50,
+                parallelUploads: 5,
                 maxFiles: 5,
-                acceptedFiles: ".mkv,.mp4",
-                dictRemoveFile: "Batal",
+                acceptedFiles: "video/*",
+                addRemoveLinks: true,
+                dictRemoveFile: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`,
+                clickable: true,
+                thumbnailWidth: 300,
+                thumbnailHeight: 300,
             });
 
-            const form = document.getElementById('my-dropzone-form');
+            myDropzone.on("addedfile", function(file) {
+                if (file.size > MAX_MB * 1024 * 1024) {
+                    showToast(`Ukuran video maksimal ${MAX_MB}MB`, 'error');
+                    myDropzone.removeFile(file);
+                }
+            });
 
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
 
-                if (myDropzone.getAcceptedFiles().length === 0) {
-                    Swal.fire({
-                        title: 'Peringatan',
-                        text: 'Minimal 1 Video!',
-                        icon: 'warning',
-                        showCancelButton: true,
-                        showConfirmButton: false,
-                        cancelButtonText: 'Batal',
-                        reverseButtons: true,
-                        confirmButtonColor: '#435ebf',
-                    });
+                const files = myDropzone.getAcceptedFiles();
+
+                if (files.length === 0) {
+                    showToast("Silakan pilih minimal satu video!", "warning");
                     return;
                 }
 
-                const files = myDropzone.getAcceptedFiles();
+                submitBtn.disabled = true;
+                submitText.classList.add('d-none');
+                submitLoading.classList.remove('d-none');
 
-                const dataTransfer = new DataTransfer();
-
-                files.forEach(file => {
-                    dataTransfer.items.add(file);
+                const previews = document.querySelectorAll('.dz-preview');
+                previews.forEach(el => {
+                    el.classList.add('upload-active');
+                    el.classList.add('is-uploading');
                 });
 
-                const fileInput = document.createElement("input");
-                fileInput.type = "file";
-                fileInput.name = "videos[]";
-                fileInput.multiple = true;
-                fileInput.style.display = "none";
-                fileInput.files = dataTransfer.files;
-                form.appendChild(fileInput);
-                form.submit();
+                const formData = new FormData(form);
+                files.forEach(file => {
+                    formData.append('videos[]', file);
+                });
+
+                const xhr = new XMLHttpRequest();
+                xhr.open("POST", form.action, true);
+                xhr.setRequestHeader('X-CSRF-TOKEN', document.querySelector('input[name="_token"]').value);
+
+                xhr.upload.onprogress = function(e) {
+                    if (e.lengthComputable) {
+                        const percent = Math.round((e.loaded / e.total) * 100);
+                        const progressBars = document.querySelectorAll('.dz-upload');
+                        progressBars.forEach(bar => {
+                            bar.style.width = percent + "%";
+                        });
+                    }
+                };
+
+                xhr.onload = function() {
+                    previews.forEach(el => {
+                        el.classList.remove('upload-active');
+                        el.classList.remove('is-uploading');
+                    });
+
+                    if (xhr.status === 200) {
+                        showToast('Upload berhasil!', 'success');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 800);
+                    } else if (xhr.status === 413) {
+                        showToast('Ukuran file terlalu besar!', 'error');
+                        resetButton();
+                    } else {
+                        showToast('Upload gagal!', 'error');
+                        resetButton();
+                    }
+                };
+
+                xhr.onerror = function() {
+                    showToast('Terjadi kesalahan jaringan!', 'error');
+                    resetButton();
+                    previews.forEach(el => el.classList.remove('upload-active'));
+                };
+
+                xhr.send(formData);
             });
+
+            function resetButton() {
+                submitBtn.disabled = false;
+                submitText.classList.remove('d-none');
+                submitLoading.classList.add('d-none');
+            }
         });
     </script>
     <script>

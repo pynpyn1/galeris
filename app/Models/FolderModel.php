@@ -70,4 +70,15 @@ class FolderModel extends Model
             ]);
     }
 
+
+    public function getThumbnailUrlAttribute()
+    {
+        if (!$this->thumbnail) return null;
+
+        return preg_match('/^https?:\/\//', $this->thumbnail)
+            ? $this->thumbnail
+            : asset('storage/' . $this->thumbnail);
+    }
+
+
 }

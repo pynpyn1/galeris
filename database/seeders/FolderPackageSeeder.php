@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -22,7 +23,7 @@ class FolderPackageSeeder extends Seeder
                     'Chat bot kirim pesan otomatis (template default)',
                     'Template Scan QR standar',
                 ]),
-                'price' => 55000,
+                'price' => 29000,
                 'billing_cycle' => 'monthly',
                 'storage_limit_gb' => 6,
                 'is_unlimited' => false,
@@ -44,7 +45,7 @@ class FolderPackageSeeder extends Seeder
                     'Chat bot kirim pesan otomatis (template default)',
                     'Template Scan QR standar',
                 ]),
-                'price' => 99000,
+                'price' => 49000,
                 'billing_cycle' => 'monthly',
                 'storage_limit_gb' => 12,
                 'is_unlimited' => false,
@@ -68,7 +69,7 @@ class FolderPackageSeeder extends Seeder
                     'Import nomor tamu event dari Excel',
                     'Bandwidth download lebih cepat',
                 ]),
-                'price' => 199000,
+                'price' => 119000,
                 'billing_cycle' => 'monthly',
                 'storage_limit_gb' => 20,
                 'is_unlimited' => false,
@@ -90,7 +91,7 @@ class FolderPackageSeeder extends Seeder
                     'Download prioritas',
                     'Support prioritas',
                 ]),
-                'price' => 499000,
+                'price' => 179000,
                 'billing_cycle' => 'monthly',
                 'storage_limit_gb' => 30,
                 'is_unlimited' => false,
@@ -99,6 +100,9 @@ class FolderPackageSeeder extends Seeder
                 'updated_at' => now(),
             ],
         ];
+        Schema::disableForeignKeyConstraints();
+        DB::table('package')->truncate();
+        Schema::enableForeignKeyConstraints();
 
         DB::table('package')->insert($packages);
     }

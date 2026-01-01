@@ -52,7 +52,7 @@ class PhotoController extends Controller
     {
         $request->validate([
             'photos'   => 'required|array',
-            'photos.*' => 'image|mimes:jpg,jpeg,png,webp,heic',
+            'photos.*' => 'image|mimes:jpg,jpeg,png,webp,heic|max:204800',
         ]);
 
         $user = auth()->user();

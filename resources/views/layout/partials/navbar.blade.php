@@ -22,9 +22,9 @@
             </li>
         </ul>
 
-        <a href="#"
+        <a href="{{ route('login') }}"
             class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-semibold transition shadow-md shadow-indigo-200">
-            Buat Ivent
+            Buat Event
         </a>
     </div>
 </nav>
