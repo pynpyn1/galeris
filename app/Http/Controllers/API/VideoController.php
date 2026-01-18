@@ -10,9 +10,7 @@ use Yajra\DataTables\Facades\DataTables;
 
 class VideoController extends Controller
 {
-    /**
-     * Helper function untuk format byte ke format yang dapat dibaca (KB, MB, GB).
-     */
+    
     protected function formatBytes($bytes, $precision = 1) {
         if ($bytes === 0) return '0 B';
         $units = array('B', 'KB', 'MB', 'GB', 'TB');

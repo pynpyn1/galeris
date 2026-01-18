@@ -79,11 +79,6 @@ class URLController extends Controller
             ->with('success', 'URL berhasil dibuat dan QR dikirim ke client!');
     }
 
-
-
-
-
-
     public function destroy($id)
     {
         $link = LinkModel::findOrFail($id);
@@ -98,5 +93,4 @@ class URLController extends Controller
             ->route('manage.url.index')
             ->with('success', 'URL deleted successfully!');
     }
-
 }

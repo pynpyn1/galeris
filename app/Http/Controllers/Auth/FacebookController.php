@@ -24,7 +24,6 @@ class FacebookController extends Controller
 
         $user = User::where('facebook_id', $fbUser->id)->first();
 
-        // Download avatar Facebook
         $photoPath = null;
         if ($fbUser->avatar) {
             $contents = file_get_contents($fbUser->avatar);

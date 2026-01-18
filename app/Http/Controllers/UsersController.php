@@ -87,6 +87,4 @@ class UsersController extends Controller
 
         return redirect()->route('manage.users.index')->with('success', 'User berhasil direstore.');
     }
-
-
 }

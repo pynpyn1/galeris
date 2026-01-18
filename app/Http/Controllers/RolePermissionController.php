@@ -25,7 +25,6 @@ class RolePermissionController extends Controller
         return view('dashboard.role.management', compact('roleGroups', 'permissions'));
     }
 
-
     public function assignmentIndex()
     {
 
@@ -34,7 +33,6 @@ class RolePermissionController extends Controller
 
         return view('dashboard.role.assignment', compact('roleGroups', 'permissions'));
     }
-
 
     public function group(Request $request)
     {
@@ -61,8 +59,6 @@ class RolePermissionController extends Controller
         return back()->with('success', "Role Group {$groupName} berhasil dihapus.");
     }
 
-
-
     public function permission(Request $request)
     {
         $request->validate(['name' => 'required|string|unique:role_permission,name']);
@@ -88,7 +84,6 @@ class RolePermissionController extends Controller
 
         return back()->with('success', "Permission {$permissionName} berhasil dihapus.");
     }
-
 
     public function assign(Request $request)
     {

@@ -257,8 +257,6 @@ Route::middleware(['auth'])->group(function () {
         // Manage Package
         Route::prefix('package')->controller(PackageController::class)->middleware(['permission:manage_package'])->name('package.')->group(function() {
             Route::get('/', 'index')->name('index');
-            Route::get('/create', 'create')->name('create');
-            Route::post('/store', 'store')->name('store');
             Route::get('/edit/{package}', 'edit')->name('edit');
             Route::put('/update/{package}', 'update')->name('update');
         });
@@ -371,7 +369,4 @@ Route::get('/upload-too-large', function () {
     return redirect()->back()->with('error', 'Ukuran file terlalu besar. Maksimal 1Gib.');
 });
 
-
-// privacy-policy - Latif
-// faq - Latif
 

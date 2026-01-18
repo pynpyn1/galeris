@@ -47,7 +47,6 @@ class PhotoController extends Controller
         ]);
     }
 
-
     public function store(Request $request, FolderModel $folder)
     {
         $request->validate([
@@ -94,8 +93,6 @@ class PhotoController extends Controller
         return back()->with('success', 'Foto berhasil diupload');
     }
 
-
-
     public function destroy(FolderModel $folder, PhotoModel $photo)
     {
         abort_if($photo->folder_id !== $folder->id, 403);
@@ -122,6 +119,5 @@ class PhotoController extends Controller
 
         return back()->with('success', 'Semua foto dalam event berhasil dihapus.');
     }
-
 
 }

@@ -215,13 +215,34 @@
         </div>
 
         @if (Auth::check() && Auth::user()->hasPermissionTo('dashboard_client'))
+            @php
+                $user = Auth::user();
+            @endphp
             <div class="sidebar-footer p-3 mt-auto mb-10">
-                <a href="{{ $hasActivePackage ? 'javascript:void(0)' : route('home.subscribe') }}"
+
+                <a href="{{ !$hasActivePackage
+                    ? route('home.subscribe')
+                    : ($user->canCreateEvent()
+                        ? 'javascript:void(0)'
+                        : route('home.subscribe')) }}"
                     class="btn btn-primary border h-50 w-100 d-flex justify-content-center align-items-center mb-3"
-                    @if ($hasActivePackage) data-bs-toggle="modal" data-bs-target="#createEventModal" @endif>
+                    @if ($hasActivePackage && $user->canCreateEvent()) data-bs-toggle="modal"
+        data-bs-target="#createEventModal" @endif
+                    @if ($hasActivePackage && !$user->canCreateEvent()) data-bs-toggle="tooltip"
+        data-bs-title="Batas maksimal event paket Anda telah tercapai. Silakan upgrade paket." @endif>
                     <i class="bi bi-plus"></i>
-                    {{ $hasActivePackage ? 'Add New Event' : 'Buy New Event' }}
+
+                    @if (!$hasActivePackage)
+                        Buy New Event
+                    @elseif ($user->canCreateEvent())
+                        Add New Event
+                    @else
+                        Upgrade Package
+                    @endif
                 </a>
+
+
+
                 <a href="#"
                     class="btn btn-block border h-50 w-100 d-flex justify-content-center align-items-center"
                     onclick="logoutConfirm(event)">

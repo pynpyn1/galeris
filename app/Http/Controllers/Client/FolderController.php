@@ -92,6 +92,10 @@ class FolderController extends Controller
     {
         $user = Auth::user();
 
+        if (!$user->canCreateFolder()) {
+            abort(403, 'Batas maksimal event pada paket Anda telah tercapai.');
+        }
+
         if (!$user->activePurchase()->exists()) {
 
             $trialFolderCount = FolderModel::where('user_id', $user->id)
@@ -158,8 +162,6 @@ class FolderController extends Controller
                     : 'Event berhasil dibuat.'
             );
     }
-
-
 
     public function edit($id)
     {
@@ -235,7 +237,6 @@ class FolderController extends Controller
 
         return redirect()->route('folder.client.index')->with('success', 'Folder berhasil diupdate.');
     }
-
 
     public function destroy($id)
     {

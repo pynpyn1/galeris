@@ -11,6 +11,7 @@ class PackageController extends Controller
     {
         return view('dashboard.package.read');
     }
+    
     public function edit($id)
     {
         $package = PackageModel::findOrFail($id);

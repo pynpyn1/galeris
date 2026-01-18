@@ -163,10 +163,9 @@ class EventController extends Controller
                 continue;
             }
 
-            // NON-PREMIUM → COMPRESS
             $image = $manager
                 ->read($originalPath)
-                ->scale(width: 1920)   // ❗ tidak gepeng
+                ->scale(width: 1920)
                 ->toJpeg(75);
 
             $zip->addFromString(

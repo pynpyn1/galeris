@@ -121,8 +121,8 @@ class QrCodeController extends Controller
             $caption = $chatbot
                 ? str_replace(['{name}', '{url}'], [$user->name, $fullUrl], $chatbot->message)
                 : "Halo Kak {name}, Terima kasih telah hadir dan memeriahkan acara kami!
-Foto-foto keseruan acara tadi sudah bisa dilihat dan diunduh. Yuk, cek momen-momennya di galeri berikut: {url}
-Selamat menikmati kenangannya!";
+                    Foto-foto keseruan acara tadi sudah bisa dilihat dan diunduh. Yuk, cek momen-momennya di galeri berikut: {url}
+                    Selamat menikmati kenangannya!";
 
             $response = Http::attach(
                 'file',
@@ -146,10 +146,6 @@ Selamat menikmati kenangannya!";
             ->route('qrcode.index')
             ->with('success', 'QR berhasil dibuat dan dikirim (jika WA aktif).');
     }
-
-
-
-
 
     public function destroy($id)
     {

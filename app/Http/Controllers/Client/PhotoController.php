@@ -11,9 +11,6 @@ use Illuminate\Support\Facades\Storage;
 
 class PhotoController extends Controller
 {
-    /**
-     * Menampilkan semua folder & foto milik user.
-     */
     public function index()
     {
         $userId = Auth::id();
@@ -104,11 +101,6 @@ class PhotoController extends Controller
         return response()->json(['message' => 'Invalid request'], 400);
     }
 
-
-
-    /**
-     * Form upload foto (pilih folder sendiri).
-     */
     public function create()
     {
         $userId = Auth::id();
@@ -118,10 +110,6 @@ class PhotoController extends Controller
         return view('dashboard.client.photo.create', compact('folders'));
     }
 
-
-    /**
-     * Proses upload foto.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -131,7 +119,6 @@ class PhotoController extends Controller
 
         $userId = Auth::id();
 
-        // Cek apakah folder benar milik user
         FolderModel::where('id', $request->folder_id)
             ->where('user_id', $userId)
             ->firstOrFail();
@@ -150,10 +137,6 @@ class PhotoController extends Controller
             ->with('success', 'Foto berhasil diunggah.');
     }
 
-
-    /**
-     * Detail folder & listing foto-foto.
-     */
     public function showFolder($folderId)
     {
         $userId = Auth::id();
@@ -169,15 +152,10 @@ class PhotoController extends Controller
         return view('dashboard.client.photo.edit', compact('folder', 'photos'));
     }
 
-
-    /**
-     * Form edit foto (pindah folder / ganti foto).
-     */
     public function edit($id)
     {
         $userId = Auth::id();
 
-        // Foto harus berasal dari folder milik user
         $photo = PhotoModel::where('id', $id)
             ->whereHas('folder', function($q) use ($userId) {
                 $q->where('user_id', $userId);
@@ -189,10 +167,6 @@ class PhotoController extends Controller
         return view('photo.edit', compact('photo', 'folders'));
     }
 
-
-    /**
-     * Update foto.
-     */
     public function update(Request $request, $id)
     {
         $userId = Auth::id();
@@ -208,7 +182,6 @@ class PhotoController extends Controller
             'photo_file' => 'nullable|image|max:5120',
         ]);
 
-        // Pastikan user punya folder tujuan
         FolderModel::where('id', $request->folder_id)
             ->where('user_id', $userId)
             ->firstOrFail();
@@ -217,7 +190,6 @@ class PhotoController extends Controller
             'folder_id' => $request->folder_id
         ];
 
-        // Jika ganti foto
         if ($request->hasFile('photo_file')) {
 
             if (Storage::disk('public')->exists($photo->file_path)) {
@@ -235,9 +207,6 @@ class PhotoController extends Controller
     }
 
 
-    /**
-     * Hapus foto milik user.
-     */
     public function destroy($id)
     {
         $userId = Auth::id();
@@ -256,4 +225,5 @@ class PhotoController extends Controller
 
         return redirect()->back()->with('success', 'Foto berhasil dihapus.');
     }
+
 }

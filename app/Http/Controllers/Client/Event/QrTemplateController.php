@@ -51,7 +51,6 @@ class QrTemplateController extends Controller
         ]);
     }
 
-
     public function download(FolderModel $folder, $templateFile)
     {
         $link = $folder->link;
@@ -88,7 +87,5 @@ class QrTemplateController extends Controller
 
         return response()->download($tempPath)->deleteFileAfterSend(true);
     }
-
-
 
 }

@@ -51,8 +51,6 @@ class PurchaseController extends Controller
         return redirect()->route('home.checkout.show', $purchase);
     }
 
-
-
     public function show(PurchaseModel $purchase)
     {
         abort_if($purchase->user_id !== auth()->id(), 403);
@@ -74,11 +72,6 @@ class PurchaseController extends Controller
             compact('purchase', 'badge', 'hasActivePackage')
         );
     }
-
-
-
-
-
 
     public function confirm(Request $request, PurchaseModel $purchase)
     {
@@ -183,9 +176,6 @@ class PurchaseController extends Controller
         return back()->with('success', 'Voucher berhasil diterapkan!');
     }
 
-
-
-    // Midtrans
     public function snapCheckout(Request $request, PurchaseModel $purchase)
     {
         if ($purchase->snap_status === 'success' || $purchase->payment_status === 'paid') {
@@ -341,12 +331,5 @@ class PurchaseController extends Controller
             'auto_renew'            => false,
         ]);
     }
-
-
-
-
-
-
-
 
 }

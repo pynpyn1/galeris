@@ -187,5 +187,69 @@ class User extends Authenticatable
         return in_array($plan, ['pro', 'premium']);
     }
 
+    public function maxFolderLimit(): ?int
+    {
+        $plan = $this->activePurchase?->package?->plan;
+
+        return match ($plan) {
+            'beginner' => 4,
+            'basic'    => 7,
+            'pro', 'premium' => null,
+            default    => 1,
+        };
+    }
+
+    public function totalFolders(): int
+    {
+        return FolderModel::where('user_id', $this->id)->count();
+    }
+
+    public function canCreateFolder(): bool
+    {
+        $limit = $this->maxFolderLimit();
+
+        if ($limit === null) {
+            return true;
+        }
+
+        return $this->totalFolders() < $limit;
+    }
+
+    public function remainingFolderQuota(): ?int
+    {
+        $limit = $this->maxFolderLimit();
+
+        if ($limit === null) {
+            return null;
+        }
+
+        return max(0, $limit - $this->totalFolders());
+    }
+
+    public function canCreateEvent(): bool
+    {
+        $purchase = $this->activePurchase;
+
+        if (!$purchase || !$purchase->package) {
+            return false;
+        }
+
+        $plan = $purchase->package->plan;
+
+        if (in_array($plan, ['pro', 'premium'])) {
+            return true;
+        }
+
+        $limit = match ($plan) {
+            'beginner' => 4,
+            'basic'    => 7,
+            default    => 0,
+        };
+
+        $totalEvent = \App\Models\FolderModel::where('user_id', $this->id)->count();
+
+        return $totalEvent < $limit;
+    }
+
 
 }

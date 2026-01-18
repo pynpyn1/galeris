@@ -20,5 +20,4 @@ class ProvidePhotoController extends Controller
 
         return view('media', compact('media', 'link'));
     }
-
 }

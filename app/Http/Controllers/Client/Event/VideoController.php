@@ -44,7 +44,6 @@ class VideoController extends Controller
         ]);
     }
 
-
    public function store(Request $request, FolderModel $folder)
     {
         $request->validate([
@@ -84,8 +83,6 @@ class VideoController extends Controller
         return back()->with('success', 'Video berhasil diupload');
     }
 
-
-
     public function destroy(FolderModel $folder, VideoModel $video)
     {
         abort_if($video->folder_id !== $folder->id, 403);
@@ -112,6 +109,5 @@ class VideoController extends Controller
 
         return back()->with('success', 'Semua video dalam event berhasil dihapus.');
     }
-
 
 }

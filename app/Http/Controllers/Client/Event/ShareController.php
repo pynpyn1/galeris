@@ -47,6 +47,7 @@ class ShareController extends Controller
             'isPro' => $isPro
         ]);
     }
+
     public function generateqr(FolderModel $folder, Request $request)
     {
         $link = $folder->link()->first();
@@ -98,10 +99,6 @@ class ShareController extends Controller
         ]);
     }
 
-
-
-
-
     public function remind(FolderModel $folder, Request $request)
     {
         $request->validate([
@@ -120,7 +117,6 @@ class ShareController extends Controller
             'message' => 'Berhasil mengupdate'
         ]);
     }
-
 
     public function downloadTemplate(FolderModel $folder)
     {
@@ -176,8 +172,6 @@ class ShareController extends Controller
         ]);
     }
 
-
-
     public function import(FolderModel $folder, Request $request)
     {
         $purchase = PurchaseModel::with('package')
@@ -208,10 +202,5 @@ class ShareController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
-
-
-
-
-
 
 }

@@ -6,10 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use ZipArchive;
-
-// Impor Model yang diperlukan
 use App\Models\FolderModel;
-use App\Models\VideoModel; // Hanya menggunakan VideoModel
+use App\Models\VideoModel;
 
 class VideoController extends Controller
 {
@@ -23,7 +21,6 @@ class VideoController extends Controller
         $folders = FolderModel::where('visibility', 'public')->get();
         return view('dashboard.video.create', compact('folders'));
     }
-
 
     public function store(Request $request)
     {
@@ -60,9 +57,6 @@ class VideoController extends Controller
         }
     }
 
-
-
-
     public function edit($id)
     {
        $folder = FolderModel::findOrFail($id);
@@ -74,38 +68,29 @@ class VideoController extends Controller
     return view('dashboard.video.edit', compact('folder', 'videos'));
     }
 
-
-    /**
-     * Memperbarui video tunggal.
-     */
     public function update(Request $request, $id)
     {
-        // Menggunakan VideoModel
         $video = VideoModel::findOrFail($id);
 
         if ($video->trashed()) {
             return redirect()->route('manage.video.index')->with('success', 'Video berhasil di-restore dan diaktifkan kembali.');
         }
 
-        // Validasi untuk file video baru
         $request->validate([
             'folder_id' => ['required', 'exists:folder,id'],
-            'video_file' => ['nullable', 'file', 'mimes:mp4,mov,avi,wmv,flv,webm', 'max:102400'], // Validasi file video
+            'video_file' => ['nullable', 'file', 'mimes:mp4,mov,avi,wmv,flv,webm', 'max:102400'],
         ]);
 
         $updateData = ['folder_id' => $request->folder_id];
 
-        // Mengubah dari 'photo_file' menjadi 'video_file'
         if ($request->hasFile('video_file')) {
             try {
-                // Hapus file lama
                 if (Storage::disk('public')->exists($video->file_path)) {
                     Storage::disk('public')->delete($video->file_path);
                 }
 
                 $file = $request->file('video_file');
 
-                // Mengubah folder penyimpanan
                 $path = $file->store('videos', 'public');
 
                 $updateData['file_path'] = $path;
@@ -124,22 +109,15 @@ class VideoController extends Controller
         return redirect()->route('manage.video.index')->with('success', 'Video berhasil diperbarui.');
     }
 
-
-    /**
-     * Menghapus video tunggal.
-     */
     public function destroy($id)
     {
-        // Menggunakan VideoModel
         $video = VideoModel::findOrFail($id);
 
         try {
-            // Hapus file dari storage
             if (Storage::disk('public')->exists($video->file_path)) {
                 Storage::disk('public')->delete($video->file_path);
             }
 
-            // Soft delete record
             $video->delete();
 
             return redirect()->route('manage.video.index')->with('success', 'Video berhasil dihapus (soft deleted).');

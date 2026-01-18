@@ -17,17 +17,14 @@ class PackageController extends Controller
 
             return DataTables::of($query)
                 ->addIndexColumn()
-
                 ->addColumn('status', function ($package) {
                     $class = $package->is_active ? 'bg-light-success' : 'bg-danger';
                     $text  = $package->is_active ? 'Active' : 'Inactive';
                     return "<span class='badge {$class}'>{$text}</span>";
                 })
-
                 ->addColumn('price', function ($package) {
                     return 'Rp ' . number_format($package->price, 0, ',', '.');
                 })
-
                 ->addColumn('action', function ($package) {
                     $editUrl   = route('manage.package.edit', $package->id);
 
@@ -35,7 +32,6 @@ class PackageController extends Controller
                         <a href="'.$editUrl.'" class="btn btn-info btn-sm me-2">Edit</a>
                     ';
                 })
-
                 ->rawColumns(['status','action'])
                 ->make(true);
         }

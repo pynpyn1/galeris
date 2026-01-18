@@ -11,7 +11,6 @@ use Illuminate\Support\Str;
 
 class QrTemplateController extends Controller
 {
-
     public function index()
     {
         $templates = QRTemplateModel::latest()->get();
@@ -61,10 +60,6 @@ class QrTemplateController extends Controller
         return response()->json(['status' => 'success']);
     }
 
-
-
-
-
     public function edit($id)
     {
         $template = QRTemplateModel::findOrFail($id);
@@ -74,7 +69,6 @@ class QrTemplateController extends Controller
             'files'    => $template->files
         ]);
     }
-
 
     public function update(Request $request, $id)
     {
@@ -120,8 +114,6 @@ class QrTemplateController extends Controller
             ->with('success', 'QR Template berhasil diperbarui');
     }
 
-
-
     public function destroy($id)
     {
         $template = QRTemplateModel::with('files')->findOrFail($id);
@@ -150,6 +142,4 @@ class QrTemplateController extends Controller
 
         return back()->with('success', 'File QR Template berhasil dihapus');
     }
-
-
 }

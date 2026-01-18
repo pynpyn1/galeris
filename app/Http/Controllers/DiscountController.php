@@ -8,13 +8,11 @@ use Illuminate\Validation\Rule;
 
 class DiscountController extends Controller
 {
-   
     public function index()
     {
         return view('dashboard.discount.read');
     }
 
-   
     public function data()
     {
         $data = DiscountCodeModel::latest();
@@ -49,13 +47,11 @@ class DiscountController extends Controller
             ->make(true);
     }
 
-    
     public function create()
     {
         return view('dashboard.discount.create');
     }
 
-   
     public function store(Request $request)
     {
         $request->validate([
@@ -83,13 +79,11 @@ class DiscountController extends Controller
             ->with('success', 'Discount code berhasil dibuat');
     }
 
-   
     public function edit(DiscountCodeModel $discount)
     {
         return view('dashboard.discount.edit', compact('discount'));
     }
 
-    
     public function update(Request $request, DiscountCodeModel $discount)
     {
         $request->validate([
@@ -120,7 +114,6 @@ class DiscountController extends Controller
             ->with('success', 'Discount code berhasil diperbarui');
     }
 
-    
     public function destroy(DiscountCodeModel $discount)
     {
         $discount->delete();
@@ -130,4 +123,5 @@ class DiscountController extends Controller
             'message' => 'Discount code berhasil dihapus'
         ]);
     }
+    
 }

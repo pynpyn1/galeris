@@ -121,8 +121,6 @@ class FolderController extends Controller
         return redirect()->route('manage.folder.index')->with('success', 'Folder berhasil diupdate.');
     }
 
-
-
     public function destroy(FolderModel $folder)
     {
         $photos = $folder->photos()->withTrashed()->get();
@@ -160,6 +158,5 @@ class FolderController extends Controller
             ->route('manage.folder.index')
             ->with('error', 'Gagal menghapus folder.');
     }
-
 
 }

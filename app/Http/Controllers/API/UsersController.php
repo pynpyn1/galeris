@@ -20,14 +20,12 @@ class UsersController extends Controller
                 ->addColumn('role_group', function ($user) {
                     return $user->roleGroup->name ?? '-';
                 })
-
                 ->addColumn('status', function ($user) {
                     if ($user->deleted_at) {
                         return '<span class="badge bg-warning">Deleted</span>';
                     }
                     return '<span class="badge bg-success">Active</span>';
                 })
-
                 ->addColumn('action', function ($user) {
                     $editUrl = route('manage.users.edit', $user->id);
                     $deleteUrl = route('manage.users.destroy', $user->id);
@@ -47,7 +45,6 @@ class UsersController extends Controller
 
                     return $editBtn . $deleteForm;
                 })
-
                 ->rawColumns(['status', 'action'])
                 ->make(true);
         }

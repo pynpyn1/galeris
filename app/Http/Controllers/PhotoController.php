@@ -57,13 +57,11 @@ class PhotoController extends Controller
         }
     }
 
-
     public function create()
     {
         $folders = FolderModel::where('visibility', 'public')->get();
         return view('dashboard.photo.create', compact('folders'));
     }
-
 
     public function store(Request $request)
     {
@@ -97,9 +95,6 @@ class PhotoController extends Controller
         }
     }
 
-
-
-
     public function edit($id)
     {
        $folder = FolderModel::findOrFail($id);
@@ -110,7 +105,6 @@ class PhotoController extends Controller
 
     return view('dashboard.photo.edit', compact('folder', 'photos'));
     }
-
 
     public function update(Request $request, $id)
     {
@@ -146,7 +140,6 @@ class PhotoController extends Controller
 
         return redirect()->route('manage.photo.index')->with('success', 'Foto berhasil diperbarui.');
     }
-
 
     public function destroy($id)
     {
