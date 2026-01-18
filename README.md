@@ -5,10 +5,6 @@
 
 **Galleris** adalah platform manajemen galeri digital yang dirancang khusus untuk Fotografer dan _Wedding Organizer_. Platform ini memungkinkan penggunanya mengunggah foto/video resolusi tinggi, mengelola event, dan mendistribusikan link akses secara otomatis kepada tamu melalui integrasi WhatsApp.
 
-## Author
-
--   **Danu O** (as Kimberlynn01)
-
 ---
 
 ## Fitur Utama
