@@ -152,3 +152,4 @@ Proyek ini dilengkapi dengan 3 skema langganan utama:
 ## Status Proyek
 
 Project ini dikembangkan selama **2 minggu terakhir** (Desember 2025) untuk memberikan solusi praktis bagi industri wedding dalam mendistribusikan hasil karya fotografer ke tamu undangan secara instan.
+# galeris
